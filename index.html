@@ -143,55 +143,56 @@ body{
   margin-top:5px;
 }
 
-/* PRODUTOS AREA */
+/* PRODUTOS AREA (LISTA VERTICAL) */
 .container{
   flex:1;
   padding:30px;
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
-  gap:20px;
+  display:flex;
+  flex-direction:column;
+  gap:15px;
   overflow-y:auto;
 }
 
 /* CARD PRODUTO */
 .link-btn{
   display:flex;
-  flex-direction:column;
+  flex-direction:row; /* cards em linha */
   background:var(--card);
   border:1px solid var(--border);
   border-radius:var(--radius);
   text-decoration:none;
   color:var(--text);
-  padding:15px;
+  padding:10px;
+  gap:12px;
   transition:.3s;
+  align-items:center;
 }
 .link-btn:hover{
   border-color:var(--accent);
   box-shadow:0 0 15px var(--accent);
 }
 .link-btn img{
-  width:100%;
-  aspect-ratio:1/1; /* Imagem quadrada */
+  width:100px;       /* imagem menor e quadrada */
+  height:100px;
   object-fit:cover;
   border-radius:var(--radius);
-  margin-bottom:12px;
 }
 .link-text{
   display:flex;
   flex-direction:column;
-  gap:6px;
+  gap:4px;
 }
 .link-text .desc{
-  font-size:13px;
+  font-size:12px;
   opacity:.7;
 }
 .link-text .price{
-  font-size:16px;
+  font-size:14px;
   font-weight:bold;
   color:var(--accent);
 }
 .link-text .extra{
-  font-size:12px;
+  font-size:11px;
   color:var(--accent);
 }
 
