@@ -31,12 +31,14 @@ body{
   background:var(--bg);
   color:var(--text);
   transition:.3s;
+  display:flex;
 }
 
 .container{
-  max-width:600px;
+  max-width:900px;
   margin:auto;
   padding:30px 15px;
+  flex:1;
 }
 
 header{
@@ -89,6 +91,28 @@ h1{
   transform:scale(1.2);
 }
 
+.sidebar{
+  width:220px;
+  background:var(--card);
+  border-right:1px solid var(--border);
+  padding:15px;
+  display:flex;
+  flex-direction:column;
+  gap:15px;
+}
+
+.sidebar input[type="range"]{
+  width:100%;
+}
+
+.sidebar input[type="text"]{
+  padding:5px 10px;
+  border-radius:5px;
+  border:1px solid var(--border);
+  background:var(--bg);
+  color:var(--text);
+}
+
 .link-btn{
   display:flex;
   align-items:center;
@@ -96,7 +120,7 @@ h1{
   background:var(--card);
   border:1px solid var(--border);
   padding:12px 15px;
-  border-radius:50px;
+  border-radius:10px;
   margin-bottom:12px;
   text-decoration:none;
   color:var(--text);
@@ -138,119 +162,143 @@ h1{
   margin-top:3px;
   color:var(--accent);
 }
+
+.products-area{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
 </style>
 </head>
 <body>
 
-<div class="container">
-
-<header>
+<div class="sidebar">
   <div class="logo">KT</div>
   <h1>Loja Kalthira</h1>
   <div class="theme-toggle" onclick="toggleTheme()">🌗 Alternar Tema</div>
 
   <div class="social-icons">
-    <a href="https://www.instagram.com/loja_kalthira/" target="_blank">
-      <i class="fab fa-instagram"></i>
-    </a>
-
-    <a href="https://t.me/+wbXlTeQ_ZjczNjlh" target="_blank">
-      <i class="fab fa-telegram"></i>
-    </a>
-
-    <a href="https://facebook.com/LojaKalthira/" target="_blank">
-      <i class="fab fa-facebook"></i>
-    </a>
+    <a href="https://www.instagram.com/loja_kalthira/" target="_blank"><i class="fab fa-instagram"></i></a>
+    <a href="https://t.me/+wbXlTeQ_ZjczNjlh" target="_blank"><i class="fab fa-telegram"></i></a>
+    <a href="https://facebook.com/LojaKalthira/" target="_blank"><i class="fab fa-facebook"></i></a>
   </div>
-</header>
 
-<div id="produtos"></div>
+  <h3>Categorias</h3>
+  <button onclick="filtrar('todos')">Todos</button>
+  <button onclick="filtrar('eletronicos')">Eletrônicos</button>
+  <button onclick="filtrar('seguranca')">Segurança</button>
+  <button onclick="filtrar('gamer')">Gamer</button>
+  <button onclick="filtrar('casa')">Casa</button>
 
+  <h3>Preço Máximo</h3>
+  <input type="range" id="precoSlider" min="0" max="2000" step="10" value="2000" oninput="filtrarPreco()">
+  <div>R$ <span id="precoValue">2000</span></div>
+
+  <h3>Pesquisar</h3>
+  <input type="text" id="searchInput" placeholder="Digite o nome do produto" oninput="filtrarPesquisa()">
 </div>
+
+<div class="container products-area" id="produtos"></div>
 
 <script>
 // ===== LISTA DE PRODUTOS =====
 
 const produtos = [
-
 {
   nome: "Câmera De Vídeo Wi-Fi Intelbras IM3 C MicroSD 32GB Branco",
-  preco: "R$ 239",
+  categoria: "seguranca",
+  preco: 239,
+  precoText: "R$ 239",
   extra: "6x R$ 39,83 sem juros",
   app: "Mercado Livre",
   link: "https://www.mercadolivre.com.br/cmera-de-video-wi-fi-intelbras-im3-c-microsd-32gb-branco/p/MLB23409605?pdp_filters=item_id%3AMLB4077829432#polycard_client=affiliates&wid=MLB4077829432&sid=affiliates",
   imagem: "https://http2.mlstatic.com/D_Q_NP_849785-MLA88970380283_072025-F.webp",
-  desc: [
-    "Unidades por kit: 1.",
-    "Compatível com assistentes virtuais como Amazon Alexa e Google Assistente.",
-    "Notificação por movimento"
-  ]
+  desc: ["Unidades por kit: 1.","Compatível com assistentes virtuais como Amazon Alexa e Google Assistente.","Notificação por movimento"]
 },
-
 {
   nome: "Smartphone Motorola Moto g35 5G - 256GB 12GB (4GB RAM+8GB Ram Boost)",
-  preco: "R$ 989,10",
+  categoria: "eletronicos",
+  preco: 989.10,
+  precoText: "R$ 989,10",
   extra: "ou R$ 1.099 em 10x R$ 109,90 sem juros",
   app: "Mercado Livre",
   link: "https://www.mercadolivre.com.br/smartphone-motorola-moto-g35-5g-256gb-12gb-4gb-ram8gb-ram-boost-e-camera-50mp-com-ai-nfc-tela-67-com-superbrilho-cinza/p/MLB41998152?pdp_filters=item_id%3AMLB3953571145#polycard_client=affiliates&wid=MLB3953571145&sid=affiliates",
   imagem: "https://http2.mlstatic.com/D_Q_NP_743327-MLA99452274448_112025-F.webp",
-  desc: [
-    "Memória RAM: 4 GB.",
-    "Compatível com redes 5G.",
-    "Tela de 6.7",
-    "Memória interna de 256GB."
-  ]
+  desc: ["Memória RAM: 4 GB.","Compatível com redes 5G.","Tela de 6.7","Memória interna de 256GB."]
 },
-
 {
   nome: "Celular Samsung Galaxy A07 256gb, 8gb.",
-  preco: "R$ 989,10",
+  categoria: "eletronicos",
+  preco: 989.10,
+  precoText: "R$ 989,10",
   extra: "ou R$ 1.099 em 10x R$ 109,90 sem juros",
   app: "Mercado Livre",
   link: "https://www.mercadolivre.com.br/celular-samsung-galaxy-a07-256gb-8gb-cmera-50mp-tela-67-proteco-ip54-processador-6nm-preto/p/MLB54961556#polycard_client=recommendations_home_navigation-recommendations&reco_backend=machinalis-homes-univb-equivalent-offer&wid=MLB5798783286&reco_client=home_navigation-recommendations&reco_item_pos=2&reco_backend_type=function&reco_id=30c52db3-18b2-4487-b754-575b490a9c20&sid=recos&c_id=/home/navigation-recommendations/element&c_uid=7346d106-2114-453d-8950-995160c6d2f9",
   imagem: "https://http2.mlstatic.com/D_Q_NP_895724-MLA91526198522_092025-F.webp",
-  desc: [
-    "Tela PLS LCD de 6.7",
-    "Bateria de 5000 Ah.",
-    "Memória interna de 256GB.",
-    "Resistente à água.",
-    "Resistente à poeira."
-  ]
+  desc: ["Tela PLS LCD de 6.7","Bateria de 5000 Ah.","Memória interna de 256GB.","Resistente à água.","Resistente à poeira."]
 }
-
 ];
 
-// ===== GERAR PRODUTOS AUTOMATICAMENTE =====
+// ===== GERAR PRODUTOS =====
 
 const container = document.getElementById("produtos");
+let categoriaAtual = "todos";
+let precoMax = 2000;
+let pesquisa = "";
 
-produtos.forEach(produto => {
+function renderProdutos(){
+  container.innerHTML = "";
 
-  const link = document.createElement("a");
-  link.className = "link-btn";
-  link.href = produto.link;
-  link.target = "_blank";
+  const filtrados = produtos.filter(p => {
+    return (categoriaAtual === "todos" || p.categoria === categoriaAtual)
+      && p.preco <= precoMax
+      && p.nome.toLowerCase().includes(pesquisa.toLowerCase());
+  });
 
-  link.innerHTML = `
-    <img src="${produto.imagem}">
-    <div class="link-text">
-      ${produto.nome}
-      <div class="desc">
-        ${produto.desc.join(" • ")}
+  filtrados.forEach(produto => {
+    const link = document.createElement("a");
+    link.className = "link-btn";
+    link.href = produto.link;
+    link.target = "_blank";
+
+    link.innerHTML = `
+      <img src="${produto.imagem}">
+      <div class="link-text">
+        ${produto.nome}
+        <div class="desc">${produto.desc.join(" • ")}</div>
+        <div class="price">${produto.precoText}</div>
+        <div class="extra">${produto.extra}</div>
       </div>
-      <div class="price">${produto.preco}</div>
-      <div class="extra">${produto.extra}</div>
-    </div>
-  `;
+    `;
 
-  container.appendChild(link);
-});
+    container.appendChild(link);
+  });
+}
+
+function filtrar(cat){
+  categoriaAtual = cat;
+  renderProdutos();
+}
+
+function filtrarPreco(){
+  precoMax = document.getElementById("precoSlider").value;
+  document.getElementById("precoValue").innerText = precoMax;
+  renderProdutos();
+}
+
+function filtrarPesquisa(){
+  pesquisa = document.getElementById("searchInput").value;
+  renderProdutos();
+}
 
 // ===== TEMA =====
-
 function toggleTheme(){
   document.body.classList.toggle("light");
 }
+
+// ===== INIT =====
+renderProdutos();
 </script>
 
 </body>
