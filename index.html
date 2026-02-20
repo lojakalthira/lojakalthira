@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loja Kalthira</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+:root{
+  --bg:#000;
+  --card:#111;
+  --border:#2a2a2a;
+  --text:#fff;
+  --accent:#00ffcc;
+}
+
+body.light{
+  --bg:#f4f4f4;
+  --card:#ffffff;
+  --border:#dddddd;
+  --text:#111;
+  --accent:#0077ff;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+  font-family:Arial, sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  transition:.3s;
+}
+
+.container{
+  max-width:600px;
+  margin:auto;
+  padding:30px 15px;
+}
+
+header{
+  text-align:center;
+  margin-bottom:30px;
+}
+
+.logo{
+  width:90px;
+  height:90px;
+  border-radius:50%;
+  background:var(--card);
+  margin:auto;
+  margin-bottom:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
+  font-size:28px;
+  color:var(--accent);
+  border:1px solid var(--border);
+}
+
+h1{
+  font-size:18px;
+  margin-bottom:5px;
+}
+
+.theme-toggle{
+  cursor:pointer;
+  margin-top:10px;
+  font-size:13px;
+  color:var(--accent);
+}
+
+.social-icons{
+  margin-top:12px;
+  display:flex;
+  justify-content:center;
+  gap:18px;
+}
+
+.social-icons a{
+  color:var(--accent);
+  font-size:18px;
+  transition:.2s;
+}
+
+.social-icons a:hover{
+  transform:scale(1.2);
+}
+
+.link-btn{
+  display:flex;
+  align-items:center;
+  gap:15px;
+  background:var(--card);
+  border:1px solid var(--border);
+  padding:12px 15px;
+  border-radius:50px;
+  margin-bottom:12px;
+  text-decoration:none;
+  color:var(--text);
+  transition:.2s;
+}
+
+.link-btn:hover{
+  border-color:var(--accent);
+  box-shadow:0 0 10px var(--accent);
+}
+
+.link-btn img{
+  width:55px;
+  height:55px;
+  border-radius:50%;
+  object-fit:cover;
+}
+
+.link-text{
+  display:flex;
+  flex-direction:column;
+  width:100%;
+}
+
+.desc{
+  font-size:12px;
+  opacity:.7;
+}
+
+.price{
+  font-size:14px;
+  font-weight:bold;
+  color:var(--accent);
+  margin-top:4px;
+}
+
+.extra{
+  font-size:11px;
+  margin-top:3px;
+  color:var(--accent);
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<header>
+  <div class="logo">KT</div>
+  <h1>@loja_kalthira</h1>
+  <div class="theme-toggle" onclick="toggleTheme()">🌗 Alternar Tema</div>
+
+  <div class="social-icons">
+    <a href="https://www.instagram.com/loja_kalthira/" target="_blank">
+      <i class="fab fa-instagram"></i>
+    </a>
+
+    <a href="https://t.me/+wbXlTeQ_ZjczNjlh" target="_blank">
+      <i class="fab fa-telegram"></i>
+    </a>
+
+    <a href="https://facebook.com/LojaKalthira/" target="_blank">
+      <i class="fab fa-facebook"></i>
+    </a>
+  </div>
+</header>
+
+<div id="produtos"></div>
+
+</div>
+
+<script>
+// ===== LISTA DE PRODUTOS =====
+
+const produtos = [
+
+{
+  nome: "Câmera Intelbras IM3 C",
+  preco: "R$ 199,90",
+  extra: "🎟 Cupom de R$ 20",
+  app: "Mercado Livre",
+  link: "https://www.mercadolivre.com.br/",
+  imagem: "https://http2.mlstatic.com/D_NQ_NP_2X_695365-MLB72324318735_102023-F.webp",
+  desc: [
+    "Full HD",
+    "Wi-Fi",
+    "Visão Noturna"
+  ]
+},
+
+{
+  nome: "Creatina 1Kg",
+  preco: "R$ 65,45",
+  extra: "72% OFF no Pix",
+  app: "Mercado Livre",
+  link: "https://www.mercadolivre.com.br/",
+  imagem: "https://http2.mlstatic.com/D_Q_NP_640712-MLA107002677903_022026-F.webp",
+  desc: [
+    "100% Pura",
+    "Alta Performance",
+    "Sem Glúten"
+  ]
+}
+
+];
+
+// ===== GERAR PRODUTOS AUTOMATICAMENTE =====
+
+const container = document.getElementById("produtos");
+
+produtos.forEach(produto => {
+
+  const link = document.createElement("a");
+  link.className = "link-btn";
+  link.href = produto.link;
+  link.target = "_blank";
+
+  link.innerHTML = `
+    <img src="${produto.imagem}">
+    <div class="link-text">
+      ${produto.nome}
+      <div class="desc">
+        ${produto.desc.join(" • ")}
+      </div>
+      <div class="price">${produto.preco}</div>
+      <div class="extra">${produto.extra}</div>
+    </div>
+  `;
+
+  container.appendChild(link);
+});
+
+// ===== TEMA =====
+
+function toggleTheme(){
+  document.body.classList.toggle("light");
+}
+</script>
+
+</body>
+</html>
