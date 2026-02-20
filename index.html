@@ -91,39 +91,40 @@ body{
   transform:scale(1.2);
 }
 
-/* BOTÕES DE CATEGORIA MODERNOS */
+/* BOTÕES DE CATEGORIA MELHORADOS */
 .sidebar button{
   padding:10px 15px;
   border:none;
   border-radius:var(--radius);
-  background:transparent;
+  background:linear-gradient(145deg, #111, #222);
   color:var(--accent);
   cursor:pointer;
   font-size:14px;
   font-weight:bold;
-  text-align:left;
+  transition:.3s;
   position:relative;
   overflow:hidden;
-  transition:.3s;
-  box-shadow: inset 0 0 0 0 var(--accent);
+  box-shadow: 0 0 5px #000;
 }
-.sidebar button::before{
+.sidebar button::after{
   content:"";
   position:absolute;
-  left:0;top:0;
-  width:100%;height:100%;
+  top:0;
+  left:-100%;
+  width:100%;
+  height:100%;
   background:var(--accent);
-  opacity:0;
-  transition:.3s;
-  z-index:0;
+  opacity:0.2;
+  transition:.4s;
 }
-.sidebar button:hover::before{
-  opacity:0.1;
+.sidebar button:hover::after{
+  left:0;
 }
-.sidebar button.active{
-  color:var(--bg);
-  background:var(--accent);
-  box-shadow:0 0 10px var(--accent);
+.sidebar button:hover{
+  color:#000;
+  font-weight:bold;
+  box-shadow:0 0 12px var(--accent);
+  background:var(--accent-hover);
 }
 
 /* SLIDER & INPUT */
@@ -170,7 +171,7 @@ body{
 }
 .link-btn img{
   width:100%;
-  height:160px;
+  aspect-ratio:1/1; /* Imagem quadrada */
   object-fit:cover;
   border-radius:var(--radius);
   margin-bottom:12px;
@@ -237,7 +238,7 @@ body{
   </div>
 
   <h3>Categorias</h3>
-  <button onclick="filtrar('todos')" class="active">Todos</button>
+  <button onclick="filtrar('todos')">Todos</button>
   <button onclick="filtrar('eletronicos')">Eletrônicos</button>
   <button onclick="filtrar('seguranca')">Segurança</button>
   <button onclick="filtrar('gamer')">Gamer</button>
@@ -297,14 +298,6 @@ let categoriaAtual = "todos";
 let precoMax = 2000;
 let pesquisa = "";
 
-// Atualiza classes dos botões
-function atualizarBotoes(){
-  const botoes = document.querySelectorAll(".sidebar button");
-  botoes.forEach(btn => btn.classList.remove("active"));
-  const ativo = [...botoes].find(b => b.textContent.toLowerCase() === categoriaAtual.toLowerCase() || (categoriaAtual === "todos" && b.textContent === "Todos"));
-  if(ativo) ativo.classList.add("active");
-}
-
 function renderProdutos(){
   container.innerHTML = "";
   const filtrados = produtos.filter(p => {
@@ -332,26 +325,14 @@ function renderProdutos(){
   });
 }
 
-function filtrar(cat){ 
-  categoriaAtual = cat;
-  atualizarBotoes();
-  renderProdutos(); 
-}
-function filtrarPreco(){ 
-  precoMax = document.getElementById("precoSlider").value; 
-  document.getElementById("precoValue").innerText = precoMax; 
-  renderProdutos(); 
-}
-function filtrarPesquisa(){ 
-  pesquisa = document.getElementById("searchInput").value; 
-  renderProdutos(); 
-}
+function filtrar(cat){ categoriaAtual = cat; renderProdutos(); }
+function filtrarPreco(){ precoMax = document.getElementById("precoSlider").value; document.getElementById("precoValue").innerText = precoMax; renderProdutos(); }
+function filtrarPesquisa(){ pesquisa = document.getElementById("searchInput").value; renderProdutos(); }
 
 // ===== TEMA =====
 function toggleTheme(){ document.body.classList.toggle("light"); }
 
 // ===== INIT =====
-atualizarBotoes();
 renderProdutos();
 </script>
 
