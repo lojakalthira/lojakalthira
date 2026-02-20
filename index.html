@@ -283,7 +283,6 @@ body{
 /* ===== RECENTES (carrossel) ===== */
 .carousel-wrap{
   position:relative;
-  /* ✅ corredor lateral pra setas não invadirem os cards */
   padding:0 54px;
 }
 .carousel{
@@ -340,7 +339,6 @@ body.light .carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);}
 }
 .carousel-card .mini-btn:hover{background:var(--accent-hover);}
 
-/* ✅ Setas agora ficam dentro do bloco e não invadem */
 .car-btn{
   position:absolute;
   top:50%;
@@ -359,7 +357,6 @@ body.light .carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);}
 .car-btn.left{left:10px;}
 .car-btn.right{right:10px;}
 
-/* mobile: setas menores e padding menor */
 @media(max-width:520px){
   .carousel-wrap{padding:0 46px;}
   .car-btn{width:36px;height:36px;}
@@ -428,7 +425,11 @@ body.light .carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);}
 }
 .card .actions .buy:hover{border-color:var(--accent);}
 
-/* ===== MODAL ===== */
+/* =========================
+   ✅ CORREÇÃO DO SCROLL NO MODAL (MOBILE)
+   - modal-box vira um “container” com altura máxima
+   - scroll acontece dentro do modal-box (overflow)
+   ========================= */
 .modal{
   position:fixed;
   inset:0;
@@ -440,30 +441,22 @@ body.light .carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);}
   z-index:999;
 }
 .modal.show{display:flex;}
+
+/* ✅ Agora o modal se adapta à tela e permite scroll */
 .modal-box{
   width:min(980px, 100%);
+  max-height: calc(100dvh - 32px);      /* usa altura real do dispositivo */
   background:var(--panel);
   color:var(--panel-text);
   border-radius:18px;
   border:1px solid var(--border);
   box-shadow:0 20px 50px rgba(0,0,0,.35);
-  overflow:hidden;
+  overflow-y:auto;                      /* ✅ scroll vertical */
+  -webkit-overflow-scrolling: touch;    /* ✅ scroll suave iOS */
   position:relative;
 }
-.modal-close{
-  position:absolute;
-  top:12px;
-  right:12px;
-  width:40px;height:40px;
-  border-radius:999px;
-  border:none;
-  background:var(--accent);
-  color:#000;
-  font-weight:900;
-  cursor:pointer;
-}
-.modal-close:hover{background:var(--accent-hover);}
 
+/* barra “interna” não pula */
 .modal-content{
   display:grid;
   grid-template-columns: 1fr 1fr;
@@ -473,6 +466,22 @@ body.light .carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);}
 @media(max-width:900px){
   .modal-content{grid-template-columns:1fr;}
 }
+
+.modal-close{
+  position:sticky;      /* ✅ fica visível ao rolar */
+  top:12px;
+  margin-left:auto;
+  margin-right:12px;
+  width:40px;height:40px;
+  border-radius:999px;
+  border:none;
+  background:var(--accent);
+  color:#000;
+  font-weight:900;
+  cursor:pointer;
+  z-index:10;
+}
+.modal-close:hover{background:var(--accent-hover);}
 
 .gallery{
   background:var(--panel-2);
@@ -612,7 +621,7 @@ body.light .carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);}
     <div class="hero-left">
       <h2>Bem-vindo(a) à Loja Kalthira</h2>
       <p>
-        Achadinhos e promoções selecionadas. Entre no Telegram para receber ofertas rápidas e links antes de todo mundo.
+        Um cantinho simples com produtos e links organizados pra você.
       </p>
 
       <div class="cta">
@@ -623,7 +632,6 @@ body.light .carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);}
       <div class="small-note">Dica: use as categorias, o filtro de preço e a pesquisa pra achar mais rápido.</div>
     </div>
 
-    <!-- ✅ Só ícones com links -->
     <div class="social-icons" aria-label="Redes sociais">
       <a href="https://www.instagram.com/loja_kalthira/" target="_blank" rel="noopener noreferrer" title="Instagram">
         <i class="fab fa-instagram"></i>
@@ -745,8 +753,20 @@ const produtos = [
     extra: "ou 6x R$ 39,66 sem juros",
     link: "https://www.mercadolivre.com.br/cadeira-de-escritorio-delta-boss-gamer-ergonmica-preta-com-estofado-de-malha/p/MLB19047858?offer_type=BEST_INSTALLMENTS",
     imagem: "https://http2.mlstatic.com/D_Q_NP_761829-MLA95666829898_102025-F.webp",
-    imagens: ["https://http2.mlstatic.com/D_Q_NP_898497-MLA49692821708_042022-F.webp","https://http2.mlstatic.com/D_Q_NP_761829-MLA95666829898_102025-F.webp"],
-    desc: ["Unidades por kit: 1","Material do estofamento: Malha","Cor principal: Preto","Altura do encosto: 71 cm","Largura do assento: 61 cm","Altura mínima do chão ao assento: 42 cm","Com apoio de braços: Sim.","É ergonômica: Sim"],
+    imagens: [
+      "https://http2.mlstatic.com/D_Q_NP_898497-MLA49692821708_042022-F.webp",
+      "https://http2.mlstatic.com/D_Q_NP_761829-MLA95666829898_102025-F.webp"
+    ],
+    desc: [
+      "Unidades por kit: 1",
+      "Material do estofamento: Malha",
+      "Cor principal: Preto",
+      "Altura do encosto: 71 cm",
+      "Largura do assento: 61 cm",
+      "Altura mínima do chão ao assento: 42 cm",
+      "Com apoio de braços: Sim",
+      "É ergonômica: Sim"
+    ],
     addedAt: "2026-02-21"
   }
 ];
@@ -871,12 +891,21 @@ const mExtra = document.getElementById("mExtra");
 const mDesc = document.getElementById("mDesc");
 const mBuy = document.getElementById("mBuy");
 
+/* ✅ trava o fundo SEM quebrar scroll do modal no iOS */
+let scrollYBeforeModal = 0;
+
 function abrirModalByIndex(index){
   modalIndex = index;
   const p = produtos[index];
   if(!p) return;
 
-  document.body.style.overflow = "hidden";
+  // ✅ trava o body com position fixed (melhor no iOS que overflow:hidden)
+  scrollYBeforeModal = window.scrollY || 0;
+  document.body.style.position = "fixed";
+  document.body.style.top = `-${scrollYBeforeModal}px`;
+  document.body.style.left = "0";
+  document.body.style.right = "0";
+  document.body.style.width = "100%";
 
   mTitle.textContent = p.nome;
   mPrice.textContent = p.precoText || ("R$ " + p.preco);
@@ -926,7 +955,17 @@ function trocarImagem(dir){
 
 function fecharModal(){
   modal.classList.remove("show");
-  document.body.style.overflow = "auto";
+
+  // ✅ destrava body e volta pro scroll de antes
+  const top = document.body.style.top;
+  document.body.style.position = "";
+  document.body.style.top = "";
+  document.body.style.left = "";
+  document.body.style.right = "";
+  document.body.style.width = "";
+
+  const y = top ? Math.abs(parseInt(top, 10)) : scrollYBeforeModal;
+  window.scrollTo(0, y);
 }
 
 modal.addEventListener("click", (e) => { if(e.target === modal) fecharModal(); });
