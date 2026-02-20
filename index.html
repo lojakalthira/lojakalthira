@@ -9,33 +9,46 @@
 
 <style>
 :root{
-  --bg:#000;
-  --card:#111;
-  --border:#2a2a2a;
-  --text:#fff;
+  /* Base */
+  --bg:#060809;
+  --card:#0e1113;
+  --border:#1d2326;
+  --text:#e9eef0;
+
+  /* Accent */
   --accent:#00ffcc;
   --accent-hover:#00e6b8;
   --radius:12px;
 
-  /* “estilo da sua imagem” (blocos claros) */
-  --panel:#f3f3f3;
-  --panel-2:#e7e7e7;
-  --panel-text:#111;
-  --shadow: 0 10px 25px rgba(0,0,0,.25);
+  /* Painéis (suaves, sem estourar) */
+  --panel:#0b0f11;     /* painel principal */
+  --panel-2:#101517;   /* cards */
+  --panel-text:#e9eef0;
+  --shadow: 0 10px 25px rgba(0,0,0,.35);
+
+  /* Imagens */
+  --img-bg: rgba(255,255,255,.06);
+  --img-border: rgba(255,255,255,.08);
 }
 
-/* Tema claro/escuro do seu script */
+/* Tema claro (suave, não “branco estourado”) */
 body.light{
-  --bg:#f4f4f4;
+  --bg:#f2f4f6;
   --card:#ffffff;
-  --border:#dddddd;
-  --text:#111;
+  --border:#d7dee3;
+  --text:#0f1417;
+
   --accent:#0077ff;
   --accent-hover:#005fcc;
 
   --panel:#ffffff;
-  --panel-2:#f0f0f0;
-  --panel-text:#111;
+  --panel-2:#f5f7f9;
+  --panel-text:#0f1417;
+
+  --shadow: 0 10px 25px rgba(0,0,0,.10);
+
+  --img-bg: rgba(0,0,0,.04);
+  --img-border: rgba(0,0,0,.08);
 }
 
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -47,7 +60,7 @@ body{
   min-height:100vh;
 }
 
-/* ===== TOPBAR (igual seu layout) ===== */
+/* ===== TOPBAR ===== */
 .topbar{
   width:100%;
   background:var(--card);
@@ -59,11 +72,7 @@ body{
   gap:12px;
   flex-wrap:wrap;
 }
-.brand{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
+.brand{display:flex;align-items:center;gap:10px;}
 .brand .logo{
   width:42px;height:42px;border-radius:50%;
   border:1px solid var(--border);
@@ -71,17 +80,9 @@ body{
   color:var(--accent);
   font-weight:900;
 }
-.brand h1{
-  font-size:20px;
-  font-weight:900;
-  letter-spacing:.3px;
-}
-.actions{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  flex-wrap:wrap;
-}
+.brand h1{font-size:20px;font-weight:900;letter-spacing:.3px;}
+.actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+
 .search{
   display:flex;
   align-items:center;
@@ -94,12 +95,12 @@ body{
 }
 .search i{opacity:.7;}
 .search input{
-  border:none;
-  outline:none;
+  border:none; outline:none;
   background:transparent;
   color:var(--text);
   width:100%;
 }
+
 .theme-toggle{
   cursor:pointer;
   padding:8px 12px;
@@ -111,7 +112,7 @@ body{
 }
 .theme-toggle:hover{border-color:var(--accent);}
 
-/* ===== BAR FILTROS (categoria + preço) ===== */
+/* ===== FILTROS ===== */
 .filters{
   width:100%;
   padding:12px 16px;
@@ -121,11 +122,8 @@ body{
   gap:12px;
   flex-wrap:wrap;
 }
-.categories{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-}
+
+.categories{display:flex;gap:10px;flex-wrap:wrap;}
 .cat-btn{
   padding:10px 14px;
   border-radius:10px;
@@ -142,6 +140,7 @@ body{
   color:#000;
   border-color:transparent;
 }
+
 .price-box{
   display:flex;
   align-items:center;
@@ -164,11 +163,11 @@ body{
   gap:16px;
 }
 
-/* Painel de descrição + CTA Telegram (igual sua imagem) */
+/* HERO */
 .hero{
   background:var(--panel);
   color:var(--panel-text);
-  border:1px solid rgba(0,0,0,.08);
+  border:1px solid var(--border);
   border-radius:16px;
   padding:16px;
   box-shadow: var(--shadow);
@@ -178,21 +177,10 @@ body{
   gap:16px;
   flex-wrap:wrap;
 }
-.hero h2{
-  font-size:18px;
-  margin-bottom:6px;
-}
-.hero p{
-  opacity:.85;
-  line-height:1.35;
-  max-width:780px;
-}
-.hero .cta{
-  display:flex;
-  gap:10px;
-  align-items:center;
-  flex-wrap:wrap;
-}
+.hero h2{font-size:18px;margin-bottom:6px;}
+.hero p{opacity:.85;line-height:1.35;max-width:780px;}
+.hero .cta{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+
 .btn{
   border:none;
   cursor:pointer;
@@ -201,34 +189,30 @@ body{
   font-weight:900;
   transition:.2s;
 }
-.btn.primary{
-  background:var(--accent);
-  color:#000;
-}
+.btn.primary{background:var(--accent);color:#000;}
 .btn.primary:hover{background:var(--accent-hover);}
 .btn.ghost{
   background:transparent;
-  border:1px solid rgba(0,0,0,.18);
+  border:1px solid var(--border);
   color:var(--panel-text);
 }
-.btn.ghost:hover{border-color:rgba(0,0,0,.35);}
+.btn.ghost:hover{border-color:var(--accent);}
 
-/* ===== RECENTES (carrossel com setas) ===== */
+.small-note{font-size:12px;opacity:.75;margin-top:10px;}
+
+/* ===== SEÇÕES ===== */
 .section{
   background:var(--panel);
   color:var(--panel-text);
   border-radius:16px;
-  border:1px solid rgba(0,0,0,.08);
+  border:1px solid var(--border);
   box-shadow: var(--shadow);
   padding:14px;
 }
-.section-title{
-  font-weight:900;
-  margin-bottom:10px;
-}
-.carousel-wrap{
-  position:relative;
-}
+.section-title{font-weight:900;margin-bottom:10px;}
+
+/* ===== RECENTES (carrossel) ===== */
+.carousel-wrap{position:relative;}
 .carousel{
   display:flex;
   gap:12px;
@@ -237,37 +221,40 @@ body{
   padding-bottom:6px;
 }
 .carousel::-webkit-scrollbar{height:8px;}
-.carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.2);border-radius:999px;}
+.carousel::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:999px;}
+body.light .carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);}
+
 .carousel-card{
   flex:0 0 180px;
   background:var(--panel-2);
-  border:1px solid rgba(0,0,0,.12);
+  border:1px solid var(--border);
   border-radius:14px;
   padding:10px;
   display:flex;
   flex-direction:column;
   gap:8px;
 }
+
+/* ✅ IMAGEM SEM CORTAR (RECENTES) */
 .carousel-card img{
   width:100%;
   height:120px;
-  object-fit:cover;
+  object-fit:contain;            /* <- NÃO CORTA */
   border-radius:10px;
-  background:#ddd;
+  background:var(--img-bg);
+  border:1px solid var(--img-border);
+  padding:6px;
 }
+
 .carousel-card .name{
   font-weight:800;
   font-size:13px;
   line-height:1.2;
   min-height:32px;
 }
-.carousel-card .price{
-  font-weight:900;
-}
-.carousel-card .mini{
-  opacity:.75;
-  font-size:11px;
-}
+.carousel-card .price{font-weight:900;}
+.carousel-card .mini{opacity:.75;font-size:11px;}
+
 .carousel-card .mini-btn{
   margin-top:auto;
   width:100%;
@@ -310,19 +297,24 @@ body{
 
 .card{
   background:var(--panel-2);
-  border:1px solid rgba(0,0,0,.12);
+  border:1px solid var(--border);
   border-radius:14px;
   overflow:hidden;
   display:flex;
   flex-direction:column;
   min-height:320px;
 }
+
+/* ✅ IMAGEM SEM CORTAR (GRID) */
 .card img{
   width:100%;
   height:150px;
-  object-fit:cover;
-  background:#ddd;
+  object-fit:contain;            /* <- NÃO CORTA */
+  background:var(--img-bg);
+  border-bottom:1px solid var(--img-border);
+  padding:8px;
 }
+
 .card-body{
   padding:10px;
   display:flex;
@@ -330,23 +322,11 @@ body{
   gap:8px;
   height:100%;
 }
-.card .name{
-  font-weight:900;
-  font-size:13px;
-  line-height:1.2;
-}
-.card .desc{
-  font-size:11px;
-  opacity:.78;
-  line-height:1.25;
-}
-.card .price{
-  font-weight:900;
-}
-.card .extra{
-  font-size:11px;
-  opacity:.85;
-}
+.card .name{font-weight:900;font-size:13px;line-height:1.2;}
+.card .desc{font-size:11px;opacity:.78;line-height:1.25;}
+.card .price{font-weight:900;}
+.card .extra{font-size:11px;opacity:.85;}
+
 .card .actions{
   margin-top:auto;
   display:flex;
@@ -360,19 +340,16 @@ body{
   border-radius:12px;
   font-weight:900;
 }
-.card .actions .details{
-  background:var(--accent);
-  color:#000;
-}
+.card .actions .details{background:var(--accent);color:#000;}
 .card .actions .details:hover{background:var(--accent-hover);}
 .card .actions .buy{
   background:transparent;
-  border:1px solid rgba(0,0,0,.18);
+  border:1px solid var(--border);
   color:var(--panel-text);
 }
-.card .actions .buy:hover{border-color:rgba(0,0,0,.35);}
+.card .actions .buy:hover{border-color:var(--accent);}
 
-/* ===== MODAL (2ª tela) ===== */
+/* ===== MODAL ===== */
 .modal{
   position:fixed;
   inset:0;
@@ -389,7 +366,7 @@ body{
   background:var(--panel);
   color:var(--panel-text);
   border-radius:18px;
-  border:1px solid rgba(0,0,0,.10);
+  border:1px solid var(--border);
   box-shadow:0 20px 50px rgba(0,0,0,.35);
   overflow:hidden;
   position:relative;
@@ -420,23 +397,26 @@ body{
 
 .gallery{
   background:var(--panel-2);
-  border:1px solid rgba(0,0,0,.12);
+  border:1px solid var(--border);
   border-radius:16px;
   padding:12px;
   display:flex;
   flex-direction:column;
   gap:10px;
 }
-.gallery-main{
-  position:relative;
-}
+.gallery-main{position:relative;}
+
+/* ✅ IMAGEM SEM CORTAR (MODAL) */
 .gallery-main img{
   width:100%;
   height:320px;
-  object-fit:cover;
+  object-fit:contain;            /* <- NÃO CORTA */
   border-radius:14px;
-  background:#ddd;
+  background:var(--img-bg);
+  border:1px solid var(--img-border);
+  padding:10px;
 }
+
 .gbtn{
   position:absolute;
   top:50%;
@@ -461,39 +441,31 @@ body{
   overflow:auto;
   padding-bottom:4px;
 }
+
+/* ✅ THUMB SEM CORTAR */
 .thumbs img{
   width:70px;height:70px;
-  object-fit:cover;
+  object-fit:contain;            /* <- NÃO CORTA */
   border-radius:12px;
   border:2px solid transparent;
   cursor:pointer;
-  background:#ddd;
+  background:var(--img-bg);
+  padding:6px;
 }
-.thumbs img.active{
-  border-color:var(--accent);
-}
+.thumbs img.active{border-color:var(--accent);}
 
 .details-panel{
   background:var(--panel-2);
-  border:1px solid rgba(0,0,0,.12);
+  border:1px solid var(--border);
   border-radius:16px;
   padding:12px;
   display:flex;
   flex-direction:column;
   gap:10px;
 }
-.details-panel .title{
-  font-size:18px;
-  font-weight:900;
-  line-height:1.2;
-}
-.details-panel .price{
-  font-size:22px;
-  font-weight:900;
-}
-.details-panel .extra{
-  opacity:.9;
-}
+.details-panel .title{font-size:18px;font-weight:900;line-height:1.2;}
+.details-panel .price{font-size:22px;font-weight:900;}
+.details-panel .extra{opacity:.9;}
 .details-panel .buy{
   margin-top:6px;
   padding:12px 14px;
@@ -509,28 +481,12 @@ body{
 
 .desc-box{
   background:var(--panel);
-  border-top:1px solid rgba(0,0,0,.10);
+  border-top:1px solid var(--border);
   padding:14px;
 }
-.desc-box h3{
-  font-weight:900;
-  margin-bottom:8px;
-}
-.desc-box ul{
-  padding-left:18px;
-  line-height:1.35;
-}
+.desc-box h3{font-weight:900;margin-bottom:8px;}
+.desc-box ul{padding-left:18px;line-height:1.35;}
 .desc-box li{margin-bottom:6px;}
-.small-note{
-  font-size:12px;
-  opacity:.75;
-  margin-top:10px;
-}
-
-/* ===== Ajustes de tema escuro para painéis claros (sem perder suas cores) ===== */
-@media(prefers-color-scheme: dark){
-  /* mantém seu esquema; os painéis claros continuam porque é o estilo da imagem */
-}
 </style>
 </head>
 
@@ -579,26 +535,21 @@ body{
     <div>
       <h2>Bem-vindo(a) à Loja Kalthira</h2>
       <p>
-        Aqui você encontra promoções e achadinhos selecionados.  
+        Aqui você encontra promoções e achadinhos selecionados.
         Entre no nosso Telegram para receber links e ofertas antes de todo mundo.
       </p>
       <div class="small-note">Dica: use as categorias e a pesquisa para achar mais rápido.</div>
     </div>
 
     <div class="cta">
-      <a class="btn primary" href="https://t.me/+wbXlTeQ_ZjczNjlh" target="_blank">
-        Entrar no Telegram
-      </a>
-      <button class="btn ghost" onclick="scrollToProdutos()">
-        Ver produtos
-      </button>
+      <a class="btn primary" href="https://t.me/+wbXlTeQ_ZjczNjlh" target="_blank">Entrar no Telegram</a>
+      <button class="btn ghost" onclick="scrollToProdutos()">Ver produtos</button>
     </div>
   </div>
 
-  <!-- RECENTES -->
-  <div class="section">
+  <!-- RECENTES (AGORA TEM ID PRA ESCONDER) -->
+  <div class="section" id="recentSection">
     <div class="section-title">Produto adicionado recentemente</div>
-
     <div class="carousel-wrap">
       <button class="car-btn left" onclick="scrollRecent(-1)">&lt;</button>
       <div class="carousel" id="recentCarousel"></div>
@@ -614,7 +565,7 @@ body{
 
 </div>
 
-<!-- MODAL (2ª tela) -->
+<!-- MODAL -->
 <div class="modal" id="modal">
   <div class="modal-box" role="dialog" aria-modal="true">
     <button class="modal-close" onclick="fecharModal()">X</button>
@@ -647,11 +598,6 @@ body{
 </div>
 
 <script>
-/* =============================
-   DADOS: PRODUTOS
-   - Para ter mais imagens: use "imagens: [..]"
-   - Se não colocar "imagens", ele usa "imagem"
-============================= */
 const produtos = [
   {
     nome: "Câmera De Vídeo Wi-Fi Intelbras IM3 C MicroSD 32GB Branco",
@@ -684,12 +630,7 @@ const produtos = [
     imagens: [
       "https://http2.mlstatic.com/D_Q_NP_743327-MLA99452274448_112025-F.webp"
     ],
-    desc: [
-      "Compatível com redes 5G",
-      "Tela de 6.7",
-      "Memória interna de 256GB",
-      "Som com Dolby Atmos"
-    ],
+    desc: ["Compatível com redes 5G","Tela de 6.7","Memória interna de 256GB","Som com Dolby Atmos"],
     addedAt: "2026-02-19"
   },
   {
@@ -703,32 +644,22 @@ const produtos = [
     imagens: [
       "https://http2.mlstatic.com/D_Q_NP_895724-MLA91526198522_092025-F.webp"
     ],
-    desc: [
-      "Tela PLS LCD de 6.7",
-      "Câmera traseira de 50MP",
-      "Bateria de 5000mAh",
-      "Resistente à água e poeira"
-    ],
+    desc: ["Tela PLS LCD de 6.7","Câmera traseira de 50MP","Bateria de 5000mAh","Resistente à água e poeira"],
     addedAt: "2026-02-18"
   }
 ];
 
-/* =============================
-   FILTROS
-============================= */
 let categoriaAtual = "todos";
 let precoMax = 2000;
 let pesquisa = "";
 
 const precoSlider = document.getElementById("precoSlider");
 const precoLabel  = document.getElementById("precoLabel");
+const recentSection = document.getElementById("recentSection");
 
 const grid = document.getElementById("produtosGrid");
 const recentCarousel = document.getElementById("recentCarousel");
 
-/* =============================
-   RENDER
-============================= */
 function getFiltrados(){
   return produtos.filter(p => {
     const okCat = (categoriaAtual === "todos" || p.categoria === categoriaAtual);
@@ -742,10 +673,9 @@ function renderGrid(){
   grid.innerHTML = "";
   const filtrados = getFiltrados();
 
-  filtrados.forEach((p, idx) => {
+  filtrados.forEach(p => {
     const card = document.createElement("div");
     card.className = "card";
-
     const descPreview = (p.desc || []).slice(0,3).join(" • ");
 
     card.innerHTML = `
@@ -767,7 +697,6 @@ function renderGrid(){
 
 function renderRecent(){
   recentCarousel.innerHTML = "";
-  // Recentes: usa addedAt (se tiver), senão mantém ordem invertida
   const recentes = [...produtos].sort((a,b) => {
     const da = Date.parse(a.addedAt || "1970-01-01");
     const db = Date.parse(b.addedAt || "1970-01-01");
@@ -788,36 +717,30 @@ function renderRecent(){
   });
 }
 
-/* pegar o índice real no array produtos */
-function getRealIndex(prod){
-  return produtos.indexOf(prod);
-}
+function getRealIndex(prod){ return produtos.indexOf(prod); }
 
-/* =============================
-   CATEGORIAS UI (botão ativo)
-============================= */
+/* ====== BOTÃO ATIVO + SUMIR RECENTES ====== */
 function setActiveCatButton(cat){
   const bar = document.getElementById("catBar");
   [...bar.querySelectorAll(".cat-btn")].forEach(btn => btn.classList.remove("active"));
 
-  // Primeiro botão "Categoria" funciona como "todos"
   if(cat === "todos") bar.querySelectorAll(".cat-btn")[0].classList.add("active");
   else{
-    const map = {
-      eletronicos: 1,
-      seguranca: 2,
-      saude: 3,
-      gamer: 4,
-      casa: 5
-    };
+    const map = { eletronicos:1, seguranca:2, saude:3, gamer:4, casa:5 };
     const idx = map[cat];
     if(idx !== undefined) bar.querySelectorAll(".cat-btn")[idx].classList.add("active");
   }
 }
 
+function atualizarVisibilidadeRecentes(){
+  // ✅ só mostra recentSection quando está na tela principal (todos)
+  recentSection.style.display = (categoriaAtual === "todos" ? "block" : "none");
+}
+
 function filtrar(cat){
   categoriaAtual = cat;
   setActiveCatButton(cat);
+  atualizarVisibilidadeRecentes();
   renderGrid();
 }
 
@@ -832,9 +755,7 @@ function filtrarPesquisa(){
   renderGrid();
 }
 
-/* =============================
-   MODAL (2ª tela)
-============================= */
+/* ===== MODAL ===== */
 let modalIndex = -1;
 let galleryIndex = 0;
 
@@ -855,15 +776,12 @@ function abrirModalByIndex(index){
   const p = produtos[index];
   if(!p) return;
 
-  // trava scroll
   document.body.style.overflow = "hidden";
 
-  // textos
   mTitle.textContent = p.nome;
   mPrice.textContent = p.precoText || ("R$ " + p.preco);
   mExtra.textContent = p.extra || "";
 
-  // desc
   mDesc.innerHTML = "";
   (p.desc || []).forEach(item => {
     const li = document.createElement("li");
@@ -871,10 +789,8 @@ function abrirModalByIndex(index){
     mDesc.appendChild(li);
   });
 
-  // comprar
   mBuy.onclick = () => abrirCompra(p.link);
 
-  // galeria
   const imgs = (p.imagens && p.imagens.length) ? p.imagens : [p.imagem];
   galleryIndex = 0;
   renderGallery(imgs);
@@ -890,31 +806,20 @@ function renderGallery(imgs){
     const im = document.createElement("img");
     im.src = src;
     if(i === galleryIndex) im.classList.add("active");
-    im.onclick = () => {
-      galleryIndex = i;
-      renderGallery(imgs);
-    };
+    im.onclick = () => { galleryIndex = i; renderGallery(imgs); };
     gThumbs.appendChild(im);
   });
 
-  // habilitar/desabilitar setas
   const many = imgs.length > 1;
   gPrev.classList.toggle("disabled", !many);
   gNext.classList.toggle("disabled", !many);
-  if(!many) return;
-
-  // se quiser bloquear nas pontas, descomente:
-  // gPrev.classList.toggle("disabled", galleryIndex === 0);
-  // gNext.classList.toggle("disabled", galleryIndex === imgs.length - 1);
 }
 
 function trocarImagem(dir){
   const p = produtos[modalIndex];
   if(!p) return;
-
   const imgs = (p.imagens && p.imagens.length) ? p.imagens : [p.imagem];
   if(imgs.length <= 1) return;
-
   galleryIndex = (galleryIndex + dir + imgs.length) % imgs.length;
   renderGallery(imgs);
 }
@@ -924,37 +829,23 @@ function fecharModal(){
   document.body.style.overflow = "auto";
 }
 
-/* fechar clicando fora */
-modal.addEventListener("click", (e) => {
-  if(e.target === modal) fecharModal();
-});
+modal.addEventListener("click", (e) => { if(e.target === modal) fecharModal(); });
 
-/* =============================
-   RECENTES: setas
-============================= */
 function scrollRecent(dir){
   const amount = 420 * dir;
   recentCarousel.scrollBy({ left: amount, behavior: "smooth" });
 }
 
-/* =============================
-   COMPRA
-============================= */
 function abrirCompra(url){
   window.open(url, "_blank", "noopener,noreferrer");
 }
 
-/* =============================
-   UTIL
-============================= */
-function toggleTheme(){
-  document.body.classList.toggle("light");
-}
+function toggleTheme(){ document.body.classList.toggle("light"); }
+
 function scrollToProdutos(){
   document.getElementById("produtosSection").scrollIntoView({behavior:"smooth"});
 }
 
-/* evita quebrar HTML */
 function escapeHtml(str){
   return String(str ?? "")
     .replaceAll("&","&amp;")
@@ -968,6 +859,7 @@ function escapeHtml(str){
 precoLabel.textContent = precoSlider.value;
 renderRecent();
 renderGrid();
+atualizarVisibilidadeRecentes();
 </script>
 
 </body>
