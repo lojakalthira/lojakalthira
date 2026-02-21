@@ -645,7 +645,7 @@ body.light .carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);}
 <div class="filters">
   <div class="categories" id="catBar">
 
-    <!-- ✅ NOVO: botão que abre “telinha” com TODAS as categorias -->
+    <!-- ✅ ÚNICO: botão que abre “telinha” com TODAS as categorias -->
     <div class="cat-menu-wrap">
       <button class="cat-menu-btn" id="catMenuBtn" type="button" onclick="toggleCatMenu()">
         <i class="fa-solid fa-bars"></i> Categorias
@@ -664,13 +664,6 @@ body.light .carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);}
       </div>
     </div>
 
-    <!-- (seus botões continuam do lado, do jeito que já estava) -->
-    <button class="cat-btn active" onclick="filtrar('todos')">Categoria</button>
-    <button class="cat-btn" onclick="filtrar('eletronicos')">Eletrônicos</button>
-    <button class="cat-btn" onclick="filtrar('seguranca')">Segurança</button>
-    <button class="cat-btn" onclick="filtrar('saude')">Saúde & Beleza</button>
-    <button class="cat-btn" onclick="filtrar('gamer')">Gamer</button>
-    <button class="cat-btn" onclick="filtrar('casa')">Casa</button>
   </div>
 
   <div class="price-box">
@@ -844,7 +837,7 @@ const grid = document.getElementById("produtosGrid");
 const recentCarousel = document.getElementById("recentCarousel");
 
 /* =========================
-   ✅ NOVO: Menu de categorias (telinha)
+   ✅ Menu de categorias (telinha)
 ========================= */
 const catMenu = document.getElementById("catMenu");
 const catBackdrop = document.getElementById("catBackdrop");
@@ -898,9 +891,7 @@ function renderGrid(){
 }
 
 /* =========================
-   ✅ NOVO: “Recentes” só por 24 horas
-   - Se passou de 24h, some do "Produto adicionado recentemente"
-   - Se não tiver nenhum recente, a seção inteira some
+   ✅ “Recentes” só por 24 horas
 ========================= */
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -918,13 +909,11 @@ function renderRecent(){
     .sort((a,b) => Date.parse(b.addedAt) - Date.parse(a.addedAt))
     .slice(0, 12);
 
-  // ✅ se não tem nada recente, some com a seção
   if(recentes24h.length === 0){
     recentSection.style.display = "none";
     return;
   }
 
-  // só mostra se estiver em "todos"
   recentSection.style.display = (categoriaAtual === "todos" ? "block" : "none");
 
   recentes24h.forEach(p => {
@@ -943,30 +932,17 @@ function renderRecent(){
 
 function getRealIndex(prod){ return produtos.indexOf(prod); }
 
-function setActiveCatButton(cat){
-  const bar = document.getElementById("catBar");
-  [...bar.querySelectorAll(".cat-btn")].forEach(btn => btn.classList.remove("active"));
-
-  if(cat === "todos") bar.querySelectorAll(".cat-btn")[0].classList.add("active");
-  else{
-    const map = { eletronicos:1, seguranca:2, saude:3, gamer:4, casa:5 };
-    const idx = map[cat];
-    if(idx !== undefined) bar.querySelectorAll(".cat-btn")[idx].classList.add("active");
-  }
-}
-
 function atualizarVisibilidadeRecentes(){
-  // mantém a regra antiga: some ao trocar categoria
-  // + agora também respeita quando não existe recente 24h
   const hasRecent = produtos.some(isRecent24h);
   recentSection.style.display = (categoriaAtual === "todos" && hasRecent) ? "block" : "none";
 }
 
 function filtrar(cat){
   categoriaAtual = cat;
-  setActiveCatButton(cat);
   atualizarVisibilidadeRecentes();
   renderGrid();
+  // (opcional) fecha menu ao escolher
+  // closeCatMenu();
 }
 
 function filtrarPreco(){
@@ -996,7 +972,6 @@ const mExtra = document.getElementById("mExtra");
 const mDesc = document.getElementById("mDesc");
 const mBuy = document.getElementById("mBuy");
 
-/* trava o fundo sem quebrar scroll do modal no iOS */
 let scrollYBeforeModal = 0;
 
 function abrirModalByIndex(index){
@@ -1099,7 +1074,7 @@ function escapeHtml(str){
 
 /* INIT */
 precoLabel.textContent = precoSlider.value;
-renderRecent();               // ✅ agora já aplica 24h
+renderRecent();
 renderGrid();
 atualizarVisibilidadeRecentes();
 </script>
