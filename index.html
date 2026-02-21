@@ -122,7 +122,69 @@ body{
   flex-wrap:wrap;
 }
 
-.categories{display:flex;gap:10px;flex-wrap:wrap;}
+.categories{display:flex;gap:10px;flex-wrap:wrap; align-items:center;}
+
+/* ✅ Botão/menus de categorias */
+.cat-menu-wrap{ position:relative; }
+.cat-menu-btn{
+  padding:10px 12px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:var(--card);
+  color:var(--text);
+  font-weight:900;
+  cursor:pointer;
+  transition:.2s;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.cat-menu-btn i{ color:var(--accent); }
+.cat-menu-btn:hover{ border-color:var(--accent); }
+
+.cat-menu{
+  position:absolute;
+  top: calc(100% + 10px);
+  left:0;
+  min-width: 220px;
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:14px;
+  box-shadow: var(--shadow);
+  padding:10px;
+  display:none;
+  z-index:50;
+}
+.cat-menu.show{ display:block; }
+
+.cat-menu .menu-title{
+  font-weight:900;
+  margin-bottom:8px;
+  opacity:.9;
+}
+.cat-menu .menu-grid{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+/* “telinha” no mobile fica maior */
+@media(max-width:520px){
+  .cat-menu{
+    min-width: min(320px, calc(100vw - 32px));
+  }
+}
+
+/* backdrop pra fechar clicando fora */
+.cat-backdrop{
+  position:fixed;
+  inset:0;
+  background:transparent;
+  display:none;
+  z-index:40;
+}
+.cat-backdrop.show{ display:block; }
+
 .cat-btn{
   padding:10px 14px;
   border-radius:10px;
@@ -140,7 +202,7 @@ body{
   border-color:transparent;
 }
 
-/* ===== Filtro de preço mais bonito ===== */
+/* ===== Filtro de preço ===== */
 .price-box{
   background:var(--panel);
   border:1px solid var(--border);
@@ -188,7 +250,7 @@ body{
   gap:16px;
 }
 
-/* HERO (melhorado) */
+/* HERO */
 .hero{
   background:var(--panel);
   color:var(--panel-text);
@@ -245,7 +307,7 @@ body{
   opacity:.75;
 }
 
-/* Ícones redes sociais (só ícones) */
+/* Ícones redes sociais */
 .social-icons{
   display:flex;
   gap:12px;
@@ -306,7 +368,6 @@ body.light .carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);}
   flex-direction:column;
   gap:8px;
 }
-
 .carousel-card img{
   width:100%;
   height:120px;
@@ -316,7 +377,6 @@ body.light .carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);}
   border:1px solid var(--img-border);
   padding:6px;
 }
-
 .carousel-card .name{
   font-weight:800;
   font-size:13px;
@@ -325,7 +385,6 @@ body.light .carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);}
 }
 .carousel-card .price{font-weight:900;}
 .carousel-card .mini{opacity:.75;font-size:11px;}
-
 .carousel-card .mini-btn{
   margin-top:auto;
   width:100%;
@@ -362,7 +421,7 @@ body.light .carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);}
   .car-btn{width:36px;height:36px;}
 }
 
-/* ===== GRID DE PRODUTOS ===== */
+/* ===== GRID ===== */
 .grid{
   display:grid;
   grid-template-columns:repeat(6, 1fr);
@@ -381,7 +440,6 @@ body.light .carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);}
   flex-direction:column;
   min-height:320px;
 }
-
 .card img{
   width:100%;
   height:150px;
@@ -390,7 +448,6 @@ body.light .carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);}
   border-bottom:1px solid var(--img-border);
   padding:8px;
 }
-
 .card-body{
   padding:10px;
   display:flex;
@@ -402,7 +459,6 @@ body.light .carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);}
 .card .desc{font-size:11px;opacity:.78;line-height:1.25;}
 .card .price{font-weight:900;}
 .card .extra{font-size:11px;opacity:.85;}
-
 .card .actions{
   margin-top:auto;
   display:flex;
@@ -425,11 +481,7 @@ body.light .carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);}
 }
 .card .actions .buy:hover{border-color:var(--accent);}
 
-/* =========================
-   ✅ CORREÇÃO DO SCROLL NO MODAL (MOBILE)
-   - modal-box vira um “container” com altura máxima
-   - scroll acontece dentro do modal-box (overflow)
-   ========================= */
+/* ===== MODAL (scroll corrigido mobile) ===== */
 .modal{
   position:fixed;
   inset:0;
@@ -442,33 +494,21 @@ body.light .carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);}
 }
 .modal.show{display:flex;}
 
-/* ✅ Agora o modal se adapta à tela e permite scroll */
 .modal-box{
   width:min(980px, 100%);
-  max-height: calc(100dvh - 32px);      /* usa altura real do dispositivo */
+  max-height: calc(100dvh - 32px);
   background:var(--panel);
   color:var(--panel-text);
   border-radius:18px;
   border:1px solid var(--border);
   box-shadow:0 20px 50px rgba(0,0,0,.35);
-  overflow-y:auto;                      /* ✅ scroll vertical */
-  -webkit-overflow-scrolling: touch;    /* ✅ scroll suave iOS */
+  overflow-y:auto;
+  -webkit-overflow-scrolling: touch;
   position:relative;
 }
 
-/* barra “interna” não pula */
-.modal-content{
-  display:grid;
-  grid-template-columns: 1fr 1fr;
-  gap:14px;
-  padding:14px;
-}
-@media(max-width:900px){
-  .modal-content{grid-template-columns:1fr;}
-}
-
 .modal-close{
-  position:sticky;      /* ✅ fica visível ao rolar */
+  position:sticky;
   top:12px;
   margin-left:auto;
   margin-right:12px;
@@ -483,6 +523,16 @@ body.light .carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);}
 }
 .modal-close:hover{background:var(--accent-hover);}
 
+.modal-content{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:14px;
+  padding:14px;
+}
+@media(max-width:900px){
+  .modal-content{grid-template-columns:1fr;}
+}
+
 .gallery{
   background:var(--panel-2);
   border:1px solid var(--border);
@@ -493,7 +543,6 @@ body.light .carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);}
   gap:10px;
 }
 .gallery-main{position:relative;}
-
 .gallery-main img{
   width:100%;
   height:320px;
@@ -503,7 +552,6 @@ body.light .carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);}
   border:1px solid var(--img-border);
   padding:10px;
 }
-
 .gbtn{
   position:absolute;
   top:50%;
@@ -596,6 +644,27 @@ body.light .carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);}
 <!-- FILTROS -->
 <div class="filters">
   <div class="categories" id="catBar">
+
+    <!-- ✅ NOVO: botão que abre “telinha” com TODAS as categorias -->
+    <div class="cat-menu-wrap">
+      <button class="cat-menu-btn" id="catMenuBtn" type="button" onclick="toggleCatMenu()">
+        <i class="fa-solid fa-bars"></i> Categorias
+      </button>
+
+      <div class="cat-menu" id="catMenu" role="menu" aria-label="Menu de categorias">
+        <div class="menu-title">Escolha uma categoria</div>
+        <div class="menu-grid">
+          <button class="cat-btn" onclick="filtrar('todos'); closeCatMenu()">Todos</button>
+          <button class="cat-btn" onclick="filtrar('eletronicos'); closeCatMenu()">Eletrônicos</button>
+          <button class="cat-btn" onclick="filtrar('seguranca'); closeCatMenu()">Segurança</button>
+          <button class="cat-btn" onclick="filtrar('saude'); closeCatMenu()">Saúde &amp; Beleza</button>
+          <button class="cat-btn" onclick="filtrar('gamer'); closeCatMenu()">Gamer</button>
+          <button class="cat-btn" onclick="filtrar('casa'); closeCatMenu()">Casa</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- (seus botões continuam do lado, do jeito que já estava) -->
     <button class="cat-btn active" onclick="filtrar('todos')">Categoria</button>
     <button class="cat-btn" onclick="filtrar('eletronicos')">Eletrônicos</button>
     <button class="cat-btn" onclick="filtrar('seguranca')">Segurança</button>
@@ -620,9 +689,7 @@ body.light .carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);}
   <div class="hero">
     <div class="hero-left">
       <h2>Bem-vindo(a) à Loja Kalthira</h2>
-      <p>
-        Um cantinho simples com produtos e links organizados pra você.
-      </p>
+      <p>Um cantinho simples com produtos e links organizados pra você.</p>
 
       <div class="cta">
         <a class="btn primary" href="https://t.me/+wbXlTeQ_ZjczNjlh" target="_blank">Entrar no Telegram</a>
@@ -662,6 +729,9 @@ body.light .carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);}
   </div>
 
 </div>
+
+<!-- backdrop do menu de categorias -->
+<div class="cat-backdrop" id="catBackdrop" onclick="closeCatMenu()"></div>
 
 <!-- MODAL -->
 <div class="modal" id="modal">
@@ -757,16 +827,7 @@ const produtos = [
       "https://http2.mlstatic.com/D_Q_NP_898497-MLA49692821708_042022-F.webp",
       "https://http2.mlstatic.com/D_Q_NP_761829-MLA95666829898_102025-F.webp"
     ],
-    desc: [
-      "Unidades por kit: 1",
-      "Material do estofamento: Malha",
-      "Cor principal: Preto",
-      "Altura do encosto: 71 cm",
-      "Largura do assento: 61 cm",
-      "Altura mínima do chão ao assento: 42 cm",
-      "Com apoio de braços: Sim",
-      "É ergonômica: Sim"
-    ],
+    desc: ["Unidades por kit: 1","Material do estofamento: Malha","Cor principal: Preto","Altura do encosto: 71 cm","Largura do assento: 61 cm","Altura mínima do chão ao assento: 42 cm","Com apoio de braços: Sim","É ergonômica: Sim"],
     addedAt: "2026-02-21"
   }
 ];
@@ -782,6 +843,25 @@ const recentSection = document.getElementById("recentSection");
 const grid = document.getElementById("produtosGrid");
 const recentCarousel = document.getElementById("recentCarousel");
 
+/* =========================
+   ✅ NOVO: Menu de categorias (telinha)
+========================= */
+const catMenu = document.getElementById("catMenu");
+const catBackdrop = document.getElementById("catBackdrop");
+
+function toggleCatMenu(){
+  const open = catMenu.classList.toggle("show");
+  catBackdrop.classList.toggle("show", open);
+}
+function closeCatMenu(){
+  catMenu.classList.remove("show");
+  catBackdrop.classList.remove("show");
+}
+document.addEventListener("keydown", (e) => {
+  if(e.key === "Escape") closeCatMenu();
+});
+
+/* ========================= */
 function getFiltrados(){
   return produtos.filter(p => {
     const okCat = (categoriaAtual === "todos" || p.categoria === categoriaAtual);
@@ -817,15 +897,37 @@ function renderGrid(){
   });
 }
 
+/* =========================
+   ✅ NOVO: “Recentes” só por 24 horas
+   - Se passou de 24h, some do "Produto adicionado recentemente"
+   - Se não tiver nenhum recente, a seção inteira some
+========================= */
+const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+
+function isRecent24h(p){
+  const t = Date.parse(p.addedAt || "");
+  if(Number.isNaN(t)) return false;
+  return (Date.now() - t) <= ONE_DAY_MS;
+}
+
 function renderRecent(){
   recentCarousel.innerHTML = "";
-  const recentes = [...produtos].sort((a,b) => {
-    const da = Date.parse(a.addedAt || "1970-01-01");
-    const db = Date.parse(b.addedAt || "1970-01-01");
-    return db - da;
-  }).slice(0, 12);
 
-  recentes.forEach(p => {
+  const recentes24h = produtos
+    .filter(isRecent24h)
+    .sort((a,b) => Date.parse(b.addedAt) - Date.parse(a.addedAt))
+    .slice(0, 12);
+
+  // ✅ se não tem nada recente, some com a seção
+  if(recentes24h.length === 0){
+    recentSection.style.display = "none";
+    return;
+  }
+
+  // só mostra se estiver em "todos"
+  recentSection.style.display = (categoriaAtual === "todos" ? "block" : "none");
+
+  recentes24h.forEach(p => {
     const item = document.createElement("div");
     item.className = "carousel-card";
     item.innerHTML = `
@@ -854,7 +956,10 @@ function setActiveCatButton(cat){
 }
 
 function atualizarVisibilidadeRecentes(){
-  recentSection.style.display = (categoriaAtual === "todos" ? "block" : "none");
+  // mantém a regra antiga: some ao trocar categoria
+  // + agora também respeita quando não existe recente 24h
+  const hasRecent = produtos.some(isRecent24h);
+  recentSection.style.display = (categoriaAtual === "todos" && hasRecent) ? "block" : "none";
 }
 
 function filtrar(cat){
@@ -891,7 +996,7 @@ const mExtra = document.getElementById("mExtra");
 const mDesc = document.getElementById("mDesc");
 const mBuy = document.getElementById("mBuy");
 
-/* ✅ trava o fundo SEM quebrar scroll do modal no iOS */
+/* trava o fundo sem quebrar scroll do modal no iOS */
 let scrollYBeforeModal = 0;
 
 function abrirModalByIndex(index){
@@ -899,7 +1004,6 @@ function abrirModalByIndex(index){
   const p = produtos[index];
   if(!p) return;
 
-  // ✅ trava o body com position fixed (melhor no iOS que overflow:hidden)
   scrollYBeforeModal = window.scrollY || 0;
   document.body.style.position = "fixed";
   document.body.style.top = `-${scrollYBeforeModal}px`;
@@ -956,7 +1060,6 @@ function trocarImagem(dir){
 function fecharModal(){
   modal.classList.remove("show");
 
-  // ✅ destrava body e volta pro scroll de antes
   const top = document.body.style.top;
   document.body.style.position = "";
   document.body.style.top = "";
@@ -996,7 +1099,7 @@ function escapeHtml(str){
 
 /* INIT */
 precoLabel.textContent = precoSlider.value;
-renderRecent();
+renderRecent();               // ✅ agora já aplica 24h
 renderGrid();
 atualizarVisibilidadeRecentes();
 </script>
