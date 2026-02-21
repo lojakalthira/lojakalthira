@@ -122,6 +122,7 @@ body{
   flex-wrap:wrap;
 }
 
+/* ✅ agora só vai existir o botão do menu */
 .categories{display:flex;gap:10px;flex-wrap:wrap; align-items:center;}
 
 /* ✅ Botão/menus de categorias */
@@ -185,6 +186,7 @@ body{
 }
 .cat-backdrop.show{ display:block; }
 
+/* botões do menu (dentro da telinha) */
 .cat-btn{
   padding:10px 14px;
   border-radius:10px;
@@ -194,6 +196,7 @@ body{
   font-weight:800;
   cursor:pointer;
   transition:.2s;
+  text-align:left;
 }
 .cat-btn:hover{border-color:var(--accent);}
 .cat-btn.active{
@@ -481,7 +484,7 @@ body.light .carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);}
 }
 .card .actions .buy:hover{border-color:var(--accent);}
 
-/* ===== MODAL (scroll corrigido mobile) ===== */
+/* ===== MODAL ===== */
 .modal{
   position:fixed;
   inset:0;
@@ -643,9 +646,8 @@ body.light .carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);}
 
 <!-- FILTROS -->
 <div class="filters">
-  <div class="categories" id="catBar">
-
-    <!-- ✅ ÚNICO: botão que abre “telinha” com TODAS as categorias -->
+  <!-- ✅ só fica o botão do menu -->
+  <div class="categories">
     <div class="cat-menu-wrap">
       <button class="cat-menu-btn" id="catMenuBtn" type="button" onclick="toggleCatMenu()">
         <i class="fa-solid fa-bars"></i> Categorias
@@ -653,17 +655,11 @@ body.light .carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);}
 
       <div class="cat-menu" id="catMenu" role="menu" aria-label="Menu de categorias">
         <div class="menu-title">Escolha uma categoria</div>
-        <div class="menu-grid">
-          <button class="cat-btn" onclick="filtrar('todos'); closeCatMenu()">Todos</button>
-          <button class="cat-btn" onclick="filtrar('eletronicos'); closeCatMenu()">Eletrônicos</button>
-          <button class="cat-btn" onclick="filtrar('seguranca'); closeCatMenu()">Segurança</button>
-          <button class="cat-btn" onclick="filtrar('saude'); closeCatMenu()">Saúde &amp; Beleza</button>
-          <button class="cat-btn" onclick="filtrar('gamer'); closeCatMenu()">Gamer</button>
-          <button class="cat-btn" onclick="filtrar('casa'); closeCatMenu()">Casa</button>
+        <div class="menu-grid" id="catMenuList">
+          <!-- preenchido pelo JS -->
         </div>
       </div>
     </div>
-
   </div>
 
   <div class="price-box">
@@ -736,7 +732,7 @@ body.light .carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);}
         <div class="gallery-main">
           <button class="gbtn left" id="gPrev" onclick="trocarImagem(-1)">&lt;</button>
           <img id="gMain" src="" alt="Imagem do produto">
-          <button class="gbtn right" id="gNext" onclick="trocarImagem(1)">&gt;</button>
+          <button class="gbtn right" id="gNext" onclick="trocarImagem(1)">&lt;</button>
         </div>
         <div class="thumbs" id="gThumbs"></div>
         <div class="small-note">Se o produto tiver mais imagens, use as setas.</div>
@@ -759,6 +755,15 @@ body.light .carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);}
 </div>
 
 <script>
+const CATEGORIAS = [
+  { id:"todos", label:"Todos" },
+  { id:"eletronicos", label:"Eletrônicos" },
+  { id:"seguranca", label:"Segurança" },
+  { id:"saude", label:"Saúde & Beleza" },
+  { id:"gamer", label:"Gamer" },
+  { id:"casa", label:"Casa" },
+];
+
 const produtos = [
   {
     nome: "Câmera De Vídeo Wi-Fi Intelbras IM3 C MicroSD 32GB Branco",
@@ -837,10 +842,11 @@ const grid = document.getElementById("produtosGrid");
 const recentCarousel = document.getElementById("recentCarousel");
 
 /* =========================
-   ✅ Menu de categorias (telinha)
+   Menu de categorias (telinha)
 ========================= */
 const catMenu = document.getElementById("catMenu");
 const catBackdrop = document.getElementById("catBackdrop");
+const catMenuList = document.getElementById("catMenuList");
 
 function toggleCatMenu(){
   const open = catMenu.classList.toggle("show");
@@ -853,6 +859,19 @@ function closeCatMenu(){
 document.addEventListener("keydown", (e) => {
   if(e.key === "Escape") closeCatMenu();
 });
+
+/* cria os botões do menu e marca ativo */
+function renderCatMenu(){
+  catMenuList.innerHTML = "";
+  CATEGORIAS.forEach(c => {
+    const btn = document.createElement("button");
+    btn.className = "cat-btn" + (c.id === categoriaAtual ? " active" : "");
+    btn.type = "button";
+    btn.textContent = c.label;
+    btn.onclick = () => { filtrar(c.id); closeCatMenu(); };
+    catMenuList.appendChild(btn);
+  });
+}
 
 /* ========================= */
 function getFiltrados(){
@@ -890,8 +909,10 @@ function renderGrid(){
   });
 }
 
+function getRealIndex(prod){ return produtos.indexOf(prod); }
+
 /* =========================
-   ✅ “Recentes” só por 24 horas
+   “Recentes” só por 24 horas
 ========================= */
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -930,8 +951,6 @@ function renderRecent(){
   });
 }
 
-function getRealIndex(prod){ return produtos.indexOf(prod); }
-
 function atualizarVisibilidadeRecentes(){
   const hasRecent = produtos.some(isRecent24h);
   recentSection.style.display = (categoriaAtual === "todos" && hasRecent) ? "block" : "none";
@@ -939,10 +958,9 @@ function atualizarVisibilidadeRecentes(){
 
 function filtrar(cat){
   categoriaAtual = cat;
+  renderCatMenu();               // ✅ atualiza ativo no menu
   atualizarVisibilidadeRecentes();
   renderGrid();
-  // (opcional) fecha menu ao escolher
-  // closeCatMenu();
 }
 
 function filtrarPreco(){
@@ -1074,6 +1092,7 @@ function escapeHtml(str){
 
 /* INIT */
 precoLabel.textContent = precoSlider.value;
+renderCatMenu();        // ✅ cria o menu
 renderRecent();
 renderGrid();
 atualizarVisibilidadeRecentes();
