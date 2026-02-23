@@ -913,7 +913,7 @@ async function carregarProdutosDoJSON(){
     statusBox.classList.add("hidden");
 
     // Ajusta slider ao maior preço (opcional / facilita)
-    const maiorPreco = Math.max(2000, ...produtos.map(p => Number(p.preco) || 0));
+    const maiorPreco = Math.max(10000, ...produtos.map(p => Number(p.preco) || 0));
     precoSlider.max = String(Math.ceil(maiorPreco / 10) * 10);
     if (Number(precoSlider.value) > Number(precoSlider.max)) {
       precoSlider.value = precoSlider.max;
