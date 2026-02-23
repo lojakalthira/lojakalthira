@@ -670,7 +670,7 @@ body.light .carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);}
       <div class="price-value">R$ <span id="precoLabel">2000</span></div>
     </div>
     <div class="price-sub">Arraste para ver produtos até esse valor.</div>
-    <input type="range" id="precoSlider" min="0" max="2000" step="10" value="2000" oninput="filtrarPreco()">
+    <input type="range" id="precoSlider" min="0" max="10000" step="10" value="10000" oninput="filtrarPreco()">
   </div>
 </div>
 
@@ -839,7 +839,7 @@ function escapeHtml(str){
 ========================================= */
 let produtos = [];
 let categoriaAtual = "todos";
-let precoMax = 2000;
+let precoMax = 10000;
 let pesquisa = "";
 
 const precoSlider = document.getElementById("precoSlider");
