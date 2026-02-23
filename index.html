@@ -9,24 +9,20 @@
 
 <style>
 :root{
-  /* Base */
   --bg:#060809;
   --card:#0e1113;
   --border:#1d2326;
   --text:#e9eef0;
 
-  /* Accent */
   --accent:#00ffcc;
   --accent-hover:#00e6b8;
   --radius:12px;
 
-  /* Painéis */
   --panel:#0b0f11;
   --panel-2:#101517;
   --panel-text:#e9eef0;
   --shadow: 0 10px 25px rgba(0,0,0,.35);
 
-  /* Imagens */
   --img-bg: rgba(255,255,255,.06);
   --img-border: rgba(255,255,255,.08);
 }
@@ -124,7 +120,6 @@ body{
 
 .categories{display:flex;gap:10px;flex-wrap:wrap; align-items:center;}
 
-/* ✅ Botão/menus de categorias */
 .cat-menu-wrap{ position:relative; }
 .cat-menu-btn{
   padding:10px 12px;
@@ -168,14 +163,12 @@ body{
   gap:8px;
 }
 
-/* “telinha” no mobile fica maior */
 @media(max-width:520px){
   .cat-menu{
     min-width: min(320px, calc(100vw - 32px));
   }
 }
 
-/* backdrop pra fechar clicando fora */
 .cat-backdrop{
   position:fixed;
   inset:0;
@@ -185,7 +178,6 @@ body{
 }
 .cat-backdrop.show{ display:block; }
 
-/* botões do menu (dentro da telinha) */
 .cat-btn{
   padding:10px 14px;
   border-radius:10px;
@@ -622,6 +614,20 @@ body.light .carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);}
 .desc-box h3{font-weight:900;margin-bottom:8px;}
 .desc-box ul{padding-left:18px;line-height:1.35;}
 .desc-box li{margin-bottom:6px;}
+
+/* status de carregamento/erro */
+.status-box{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:12px;
+  font-size:14px;
+  opacity:.95;
+}
+.status-box.error{
+  border-color:#ff5c5c55;
+}
+.hidden{display:none !important;}
 </style>
 </head>
 
@@ -653,9 +659,7 @@ body.light .carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);}
 
       <div class="cat-menu" id="catMenu" role="menu" aria-label="Menu de categorias">
         <div class="menu-title">Escolha uma categoria</div>
-        <div class="menu-grid" id="catMenuList">
-          <!-- preenchido pelo JS -->
-        </div>
+        <div class="menu-grid" id="catMenuList"></div>
       </div>
     </div>
   </div>
@@ -699,6 +703,8 @@ body.light .carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);}
     </div>
   </div>
 
+  <div id="statusBox" class="status-box">Carregando produtos...</div>
+
   <!-- RECENTES -->
   <div class="section" id="recentSection">
     <div class="section-title">Produto adicionado recentemente</div>
@@ -717,7 +723,6 @@ body.light .carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);}
 
 </div>
 
-<!-- backdrop do menu de categorias -->
 <div class="cat-backdrop" id="catBackdrop" onclick="closeCatMenu()"></div>
 
 <!-- MODAL -->
@@ -754,6 +759,11 @@ body.light .carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);}
 
 <script>
 /* =========================================
+   CONFIG
+========================================= */
+const PRODUTOS_JSON_URL = "./produtos.json";
+
+/* =========================================
    CATEGORIAS
 ========================================= */
 const CATEGORIAS = [
@@ -766,12 +776,7 @@ const CATEGORIAS = [
 ];
 
 /* =========================================
-   ✅ SISTEMA FÁCIL PRA ADICIONAR PRODUTOS
-   - addProduto({...})
-   - addProdutos([...])
-   - aceita desc/imagens em texto (uma linha por item)
-   - precoText automático
-   - addedAt automático (hoje)
+   HELPERS
 ========================================= */
 function formatBRL(valor){
   const n = Number(valor || 0);
@@ -787,153 +792,52 @@ function hojeISO(){
 }
 
 function textoParaLista(valor){
-  // aceita array OU texto com quebras de linha
   if (Array.isArray(valor)) {
     return valor.map(v => String(v).trim()).filter(Boolean);
   }
   if (typeof valor !== "string") return [];
-  return valor
-    .split(/\r?\n/)
-    .map(v => v.trim())
-    .filter(Boolean);
+  return valor.split(/\r?\n/).map(v => v.trim()).filter(Boolean);
 }
 
-function normalizarProdutoFacil(p){
-  const precoNum = Number(p.preco ?? 0);
-  const listaImagens = textoParaLista(p.imagens);
+function normalizarProduto(p){
+  const precoNum = Number(p?.preco ?? 0);
+  const listaImagens = textoParaLista(p?.imagens);
 
-  const imagemPrincipal = (p.imagem && String(p.imagem).trim())
+  const imagemPrincipal = (p?.imagem && String(p.imagem).trim())
     ? String(p.imagem).trim()
     : (listaImagens[0] || "");
 
-  const imagensFinal = listaImagens.length ? listaImagens : (imagemPrincipal ? [imagemPrincipal] : []);
+  const imagensFinal = listaImagens.length
+    ? listaImagens
+    : (imagemPrincipal ? [imagemPrincipal] : []);
 
   return {
-    nome: String(p.nome ?? "").trim(),
-    categoria: String(p.categoria ?? "eletronicos").trim(),
+    nome: String(p?.nome ?? "").trim(),
+    categoria: String(p?.categoria ?? "eletronicos").trim(),
     preco: Number.isFinite(precoNum) ? precoNum : 0,
-    precoText: String(p.precoText ?? "").trim() || formatBRL(precoNum),
-    extra: String(p.extra ?? "").trim(),
-    link: String(p.link ?? "").trim(),
+    precoText: String(p?.precoText ?? "").trim() || formatBRL(precoNum),
+    extra: String(p?.extra ?? "").trim(),
+    link: String(p?.link ?? "").trim(),
     imagem: imagemPrincipal,
     imagens: imagensFinal,
-    desc: textoParaLista(p.desc),
-    addedAt: String(p.addedAt ?? "").trim() || hojeISO()
+    desc: textoParaLista(p?.desc),
+    addedAt: String(p?.addedAt ?? "").trim() || hojeISO()
   };
 }
 
-const produtos = [];
-
-function addProduto(produtoFacil){
-  produtos.push(normalizarProdutoFacil(produtoFacil));
-}
-
-function addProdutos(lista){
-  (lista || []).forEach(addProduto);
+function escapeHtml(str){
+  return String(str ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
 }
 
 /* =========================================
-   ✅ CADASTRO DOS PRODUTOS (AGORA FÁCIL)
-   - Pra adicionar novo produto, copie um bloco abaixo
+   ESTADO
 ========================================= */
-addProdutos([
-  {
-    nome: "Câmera De Vídeo Wi-Fi Intelbras IM3 C MicroSD 32GB Branco",
-    categoria: "seguranca",
-    preco: 239,
-    extra: "6x de R$ 39,83 sem juros",
-    link: "https://www.mercadolivre.com.br/cmera-de-video-wi-fi-intelbras-im3-c-microsd-32gb-branco/p/MLB23409605?pdp_filters=item_id%3AMLB4077829432#polycard_client=affiliates&wid=MLB4077829432&sid=affiliates",
-    imagem: "https://http2.mlstatic.com/D_Q_NP_849785-MLA88970380283_072025-F.webp",
-    desc: `
-Unidades por kit: 1
-Compatível com Alexa e Google Assistente
-Conexão Wi-Fi e imagem Full HD
-Visão noturna e acesso remoto
-Notificação por movimento
-`,
-    addedAt: "2026-02-20"
-  },
-  {
-    nome: "Smartphone Motorola Moto g35 5G — 256GB (RAM Boost)",
-    categoria: "eletronicos",
-    preco: 989.10,
-    extra: "ou R$ 1.099 em 10x de R$ 109,90 sem juros",
-    link: "https://www.mercadolivre.com.br/smartphone-motorola-moto-g35-5g-256gb-12gb-4gb-ram8gb-ram-boost-e-camera-50mp-com-ai-nfc-tela-67-com-superbrilho-cinza/p/MLB41998152?pdp_filters=item_id%3AMLB3953571145#polycard_client=affiliates&wid=MLB3953571145&sid=affiliates",
-    imagem: "https://http2.mlstatic.com/D_Q_NP_743327-MLA99452274448_112025-F.webp",
-    desc: `
-Compatível com redes 5G
-Tela de 6.7
-Memória interna de 256GB
-Som com Dolby Atmos
-`,
-    addedAt: "2026-02-19"
-  },
-  {
-    nome: "Celular Samsung Galaxy A07 — 256GB",
-    categoria: "eletronicos",
-    preco: 989.10,
-    extra: "ou R$ 1.099 em 10x de R$ 109,90 sem juros",
-    link: "https://www.mercadolivre.com.br/celular-samsung-galaxy-a07-256gb-8gb-cmera-50mp-tela-67-proteco-ip54-processador-6nm-preto/p/MLB54961556",
-    imagem: "https://http2.mlstatic.com/D_Q_NP_895724-MLA91526198522_092025-F.webp",
-    desc: `
-Tela PLS LCD de 6.7
-Câmera traseira de 50MP
-Bateria de 5000mAh
-Resistente à água e poeira
-`,
-    addedAt: "2026-02-18"
-  },
-  {
-    nome: "Cadeira de escritório Delta Boss gamer",
-    categoria: "gamer",
-    preco: 237.99,
-    extra: "ou 6x R$ 39,66 sem juros",
-    link: "https://www.mercadolivre.com.br/cadeira-de-escritorio-delta-boss-gamer-ergonmica-preta-com-estofado-de-malha/p/MLB19047858?offer_type=BEST_INSTALLMENTS",
-    imagem: "https://http2.mlstatic.com/D_Q_NP_761829-MLA95666829898_102025-F.webp",
-    imagens: `
-https://http2.mlstatic.com/D_Q_NP_898497-MLA49692821708_042022-F.webp
-https://http2.mlstatic.com/D_Q_NP_761829-MLA95666829898_102025-F.webp
-`,
-    desc: `
-Unidades por kit: 1
-Material do estofamento: Malha
-Cor principal: Preto
-Altura do encosto: 71 cm
-Largura do assento: 61 cm
-Altura mínima do chão ao assento: 42 cm
-Com apoio de braços: Sim
-É ergonômica: Sim
-`,
-    addedAt: "2026-02-21"
-  }
-]);
-
-/* =========================================
-   EXEMPLO DE COMO ADICIONAR NOVO PRODUTO (copiar e colar)
-   (deixe comentado)
-========================================= */
-/*
-addProduto({
-  nome: "Nome do produto",
-  categoria: "eletronicos", // eletronicos | seguranca | saude | gamer | casa
-  preco: 199.90,
-  extra: "ou 10x de R$ 19,99 sem juros",
-  link: "https://seu-link-aqui",
-  imagem: "https://sua-imagem-principal.webp",
-  imagens: `
-https://sua-imagem-1.webp
-https://sua-imagem-2.webp
-`,
-  desc: `
-Característica 1
-Característica 2
-Característica 3
-`,
-  // precoText: "R$ 199,90", // opcional (se não colocar, gera automático)
-  // addedAt: "2026-02-23"    // opcional (se não colocar, usa hoje)
-});
-*/
-
+let produtos = [];
 let categoriaAtual = "todos";
 let precoMax = 2000;
 let pesquisa = "";
@@ -941,6 +845,7 @@ let pesquisa = "";
 const precoSlider = document.getElementById("precoSlider");
 const precoLabel  = document.getElementById("precoLabel");
 const recentSection = document.getElementById("recentSection");
+const statusBox = document.getElementById("statusBox");
 
 const grid = document.getElementById("produtosGrid");
 const recentCarousel = document.getElementById("recentCarousel");
@@ -961,7 +866,10 @@ function closeCatMenu(){
   catBackdrop.classList.remove("show");
 }
 document.addEventListener("keydown", (e) => {
-  if(e.key === "Escape") closeCatMenu();
+  if(e.key === "Escape") {
+    closeCatMenu();
+    if (modal.classList.contains("show")) fecharModal();
+  }
 });
 
 /* cria os botões do menu e marca ativo */
@@ -977,12 +885,66 @@ function renderCatMenu(){
   });
 }
 
+/* =========================================
+   CARREGAR PRODUTOS DO JSON
+========================================= */
+async function carregarProdutosDoJSON(){
+  statusBox.classList.remove("hidden");
+  statusBox.classList.remove("error");
+  statusBox.textContent = "Carregando produtos...";
+
+  try{
+    const resp = await fetch(PRODUTOS_JSON_URL, { cache: "no-store" });
+
+    if(!resp.ok){
+      throw new Error(`HTTP ${resp.status} ao carregar ${PRODUTOS_JSON_URL}`);
+    }
+
+    const data = await resp.json();
+
+    if(!Array.isArray(data)){
+      throw new Error("O arquivo produtos.json precisa ser uma lista (array) de produtos.");
+    }
+
+    produtos = data
+      .map(normalizarProduto)
+      .filter(p => p.nome && p.link && p.imagem);
+
+    statusBox.classList.add("hidden");
+
+    // Ajusta slider ao maior preço (opcional / facilita)
+    const maiorPreco = Math.max(2000, ...produtos.map(p => Number(p.preco) || 0));
+    precoSlider.max = String(Math.ceil(maiorPreco / 10) * 10);
+    if (Number(precoSlider.value) > Number(precoSlider.max)) {
+      precoSlider.value = precoSlider.max;
+    }
+    precoMax = Number(precoSlider.value);
+    precoLabel.textContent = precoSlider.value;
+
+    renderRecent();
+    renderGrid();
+    atualizarVisibilidadeRecentes();
+  }catch(err){
+    console.error(err);
+    produtos = [];
+    statusBox.classList.remove("hidden");
+    statusBox.classList.add("error");
+    statusBox.innerHTML = `
+      <strong>Erro ao carregar produtos.</strong><br>
+      Verifique se o arquivo <code>produtos.json</code> está na mesma pasta do site e se o JSON está válido.
+    `;
+    renderRecent();
+    renderGrid();
+    atualizarVisibilidadeRecentes();
+  }
+}
+
 /* ========================= */
 function getFiltrados(){
   return produtos.filter(p => {
     const okCat = (categoriaAtual === "todos" || p.categoria === categoriaAtual);
-    const okPreco = p.preco <= Number(precoMax);
-    const okSearch = p.nome.toLowerCase().includes(pesquisa.toLowerCase());
+    const okPreco = Number(p.preco) <= Number(precoMax);
+    const okSearch = p.nome.toLowerCase().includes((pesquisa || "").toLowerCase());
     return okCat && okPreco && okSearch;
   });
 }
@@ -991,13 +953,22 @@ function renderGrid(){
   grid.innerHTML = "";
   const filtrados = getFiltrados();
 
+  if(filtrados.length === 0){
+    grid.innerHTML = `
+      <div class="status-box" style="grid-column:1 / -1;">
+        Nenhum produto encontrado com esse filtro/pesquisa.
+      </div>
+    `;
+    return;
+  }
+
   filtrados.forEach(p => {
     const card = document.createElement("div");
     card.className = "card";
     const descPreview = (p.desc || []).slice(0,3).join(" • ");
 
     card.innerHTML = `
-      <img src="${p.imagem}" alt="${escapeHtml(p.nome)}">
+      <img src="${escapeHtml(p.imagem)}" alt="${escapeHtml(p.nome)}" loading="lazy">
       <div class="card-body">
         <div class="name">${escapeHtml(p.nome)}</div>
         <div class="desc">${escapeHtml(descPreview)}</div>
@@ -1045,7 +1016,7 @@ function renderRecent(){
     const item = document.createElement("div");
     item.className = "carousel-card";
     item.innerHTML = `
-      <img src="${p.imagem}" alt="${escapeHtml(p.nome)}">
+      <img src="${escapeHtml(p.imagem)}" alt="${escapeHtml(p.nome)}" loading="lazy">
       <div class="name">${escapeHtml(p.nome)}</div>
       <div class="price">${escapeHtml(p.precoText || ("R$ " + p.preco))}</div>
       <div class="mini">${escapeHtml(p.extra || "")}</div>
@@ -1068,8 +1039,8 @@ function filtrar(cat){
 }
 
 function filtrarPreco(){
-  precoMax = precoSlider.value;
-  precoLabel.textContent = precoMax;
+  precoMax = Number(precoSlider.value);
+  precoLabel.textContent = precoSlider.value;
   renderGrid();
 }
 
@@ -1131,10 +1102,12 @@ function abrirModalByIndex(index){
 function renderGallery(imgs){
   gThumbs.innerHTML = "";
   gMain.src = imgs[galleryIndex] || "";
+  gMain.alt = (produtos[modalIndex]?.nome || "Imagem do produto");
 
   imgs.forEach((src, i) => {
     const im = document.createElement("img");
     im.src = src;
+    im.alt = `Miniatura ${i+1}`;
     if(i === galleryIndex) im.classList.add("active");
     im.onclick = () => { galleryIndex = i; renderGallery(imgs); };
     gThumbs.appendChild(im);
@@ -1168,7 +1141,9 @@ function fecharModal(){
   window.scrollTo(0, y);
 }
 
-modal.addEventListener("click", (e) => { if(e.target === modal) fecharModal(); });
+modal.addEventListener("click", (e) => {
+  if(e.target === modal) fecharModal();
+});
 
 function scrollRecent(dir){
   const amount = 420 * dir;
@@ -1186,21 +1161,13 @@ function scrollToProdutos(){
   document.getElementById("produtosSection").scrollIntoView({behavior:"smooth"});
 }
 
-function escapeHtml(str){
-  return String(str ?? "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-}
-
 /* INIT */
 precoLabel.textContent = precoSlider.value;
 renderCatMenu();
 renderRecent();
 renderGrid();
 atualizarVisibilidadeRecentes();
+carregarProdutosDoJSON();
 </script>
 
 </body>
