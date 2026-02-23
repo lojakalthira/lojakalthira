@@ -1,760 +1,7 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Loja Kalthira</title>
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-<style>
-:root{
-  /* Base */
-  --bg:#060809;
-  --card:#0e1113;
-  --border:#1d2326;
-  --text:#e9eef0;
-
-  /* Accent */
-  --accent:#00ffcc;
-  --accent-hover:#00e6b8;
-  --radius:12px;
-
-  /* Painéis */
-  --panel:#0b0f11;
-  --panel-2:#101517;
-  --panel-text:#e9eef0;
-  --shadow: 0 10px 25px rgba(0,0,0,.35);
-
-  /* Imagens */
-  --img-bg: rgba(255,255,255,.06);
-  --img-border: rgba(255,255,255,.08);
-}
-
-body.light{
-  --bg:#f2f4f6;
-  --card:#ffffff;
-  --border:#d7dee3;
-  --text:#0f1417;
-
-  --accent:#0077ff;
-  --accent-hover:#005fcc;
-
-  --panel:#ffffff;
-  --panel-2:#f5f7f9;
-  --panel-text:#0f1417;
-
-  --shadow: 0 10px 25px rgba(0,0,0,.10);
-
-  --img-bg: rgba(0,0,0,.04);
-  --img-border: rgba(0,0,0,.08);
-}
-
-*{margin:0;padding:0;box-sizing:border-box;}
-
-body{
-  font-family:Arial, sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  min-height:100vh;
-}
-
-/* ===== TOPBAR ===== */
-.topbar{
-  width:100%;
-  background:var(--card);
-  border-bottom:1px solid var(--border);
-  padding:12px 16px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  flex-wrap:wrap;
-}
-.brand{display:flex;align-items:center;gap:10px;}
-.brand .logo{
-  width:42px;height:42px;border-radius:50%;
-  border:1px solid var(--border);
-  display:flex;align-items:center;justify-content:center;
-  color:var(--accent);
-  font-weight:900;
-}
-.brand h1{font-size:20px;font-weight:900;letter-spacing:.3px;}
-.actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-
-.search{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  background:var(--bg);
-  border:1px solid var(--border);
-  border-radius:999px;
-  padding:8px 12px;
-  min-width:260px;
-}
-.search i{opacity:.7;}
-.search input{
-  border:none; outline:none;
-  background:transparent;
-  color:var(--text);
-  width:100%;
-}
-
-.theme-toggle{
-  cursor:pointer;
-  padding:8px 12px;
-  border-radius:999px;
-  border:1px solid var(--border);
-  background:var(--bg);
-  color:var(--accent);
-  font-weight:700;
-}
-.theme-toggle:hover{border-color:var(--accent);}
-
-/* ===== FILTROS ===== */
-.filters{
-  width:100%;
-  padding:12px 16px;
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:12px;
-  flex-wrap:wrap;
-}
-
-/* ✅ agora só vai existir o botão do menu */
-.categories{display:flex;gap:10px;flex-wrap:wrap; align-items:center;}
-
-/* ✅ Botão/menus de categorias */
-.cat-menu-wrap{ position:relative; }
-.cat-menu-btn{
-  padding:10px 12px;
-  border-radius:10px;
-  border:1px solid var(--border);
-  background:var(--card);
-  color:var(--text);
-  font-weight:900;
-  cursor:pointer;
-  transition:.2s;
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-.cat-menu-btn i{ color:var(--accent); }
-.cat-menu-btn:hover{ border-color:var(--accent); }
-
-.cat-menu{
-  position:absolute;
-  top: calc(100% + 10px);
-  left:0;
-  min-width: 220px;
-  background:var(--panel);
-  border:1px solid var(--border);
-  border-radius:14px;
-  box-shadow: var(--shadow);
-  padding:10px;
-  display:none;
-  z-index:50;
-}
-.cat-menu.show{ display:block; }
-
-.cat-menu .menu-title{
-  font-weight:900;
-  margin-bottom:8px;
-  opacity:.9;
-}
-.cat-menu .menu-grid{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-}
-
-/* “telinha” no mobile fica maior */
-@media(max-width:520px){
-  .cat-menu{
-    min-width: min(320px, calc(100vw - 32px));
-  }
-}
-
-/* backdrop pra fechar clicando fora */
-.cat-backdrop{
-  position:fixed;
-  inset:0;
-  background:transparent;
-  display:none;
-  z-index:40;
-}
-.cat-backdrop.show{ display:block; }
-
-/* botões do menu (dentro da telinha) */
-.cat-btn{
-  padding:10px 14px;
-  border-radius:10px;
-  border:1px solid var(--border);
-  background:var(--card);
-  color:var(--text);
-  font-weight:800;
-  cursor:pointer;
-  transition:.2s;
-  text-align:left;
-}
-.cat-btn:hover{border-color:var(--accent);}
-.cat-btn.active{
-  background:var(--accent);
-  color:#000;
-  border-color:transparent;
-}
-
-/* ===== Filtro de preço ===== */
-.price-box{
-  background:var(--panel);
-  border:1px solid var(--border);
-  box-shadow: var(--shadow);
-  border-radius:14px;
-  padding:12px 12px;
-  min-width:320px;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-.price-top{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-}
-.price-title{
-  font-weight:900;
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-.price-title i{color:var(--accent);}
-.price-value{
-  font-weight:900;
-  color:var(--accent);
-}
-.price-sub{
-  font-size:12px;
-  opacity:.75;
-}
-.price-box input[type="range"]{
-  width:100%;
-  accent-color:var(--accent);
-}
-
-/* ===== CONTEÚDO ===== */
-.main{
-  padding:16px;
-  max-width:1200px;
-  margin:0 auto;
-  display:flex;
-  flex-direction:column;
-  gap:16px;
-}
-
-/* HERO */
-.hero{
-  background:var(--panel);
-  color:var(--panel-text);
-  border:1px solid var(--border);
-  border-radius:16px;
-  padding:16px;
-  box-shadow: var(--shadow);
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:16px;
-  flex-wrap:wrap;
-}
-.hero-left{
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-  max-width:780px;
-}
-.hero h2{
-  font-size:18px;
-  margin:0;
-}
-.hero p{
-  opacity:.88;
-  line-height:1.45;
-}
-.hero .cta{
-  display:flex;
-  gap:10px;
-  align-items:center;
-  flex-wrap:wrap;
-}
-
-.btn{
-  border:none;
-  cursor:pointer;
-  padding:10px 14px;
-  border-radius:12px;
-  font-weight:900;
-  transition:.2s;
-}
-.btn.primary{background:var(--accent);color:#000;}
-.btn.primary:hover{background:var(--accent-hover);}
-.btn.ghost{
-  background:transparent;
-  border:1px solid var(--border);
-  color:var(--panel-text);
-}
-.btn.ghost:hover{border-color:var(--accent);}
-
-.small-note{
-  font-size:12px;
-  opacity:.75;
-}
-
-/* Ícones redes sociais */
-.social-icons{
-  display:flex;
-  gap:12px;
-  align-items:center;
-}
-.social-icons a{
-  width:40px;height:40px;
-  border-radius:999px;
-  border:1px solid var(--border);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-decoration:none;
-  background:var(--panel-2);
-  color:var(--accent);
-  transition:.2s;
-}
-.social-icons a:hover{
-  border-color:var(--accent);
-  box-shadow:0 0 12px rgba(0,255,204,.25);
-  transform:translateY(-1px);
-}
-
-/* ===== SEÇÕES ===== */
-.section{
-  background:var(--panel);
-  color:var(--panel-text);
-  border-radius:16px;
-  border:1px solid var(--border);
-  box-shadow: var(--shadow);
-  padding:14px;
-}
-.section-title{font-weight:900;margin-bottom:10px;}
-
-/* ===== RECENTES (carrossel) ===== */
-.carousel-wrap{
-  position:relative;
-  padding:0 54px;
-}
-.carousel{
-  display:flex;
-  gap:12px;
-  overflow:auto;
-  scroll-behavior:smooth;
-  padding-bottom:6px;
-}
-.carousel::-webkit-scrollbar{height:8px;}
-.carousel::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:999px;}
-body.light .carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);}
-
-.carousel-card{
-  flex:0 0 180px;
-  background:var(--panel-2);
-  border:1px solid var(--border);
-  border-radius:14px;
-  padding:10px;
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-}
-.carousel-card img{
-  width:100%;
-  height:120px;
-  object-fit:contain;
-  border-radius:10px;
-  background:var(--img-bg);
-  border:1px solid var(--img-border);
-  padding:6px;
-}
-.carousel-card .name{
-  font-weight:800;
-  font-size:13px;
-  line-height:1.2;
-  min-height:32px;
-}
-.carousel-card .price{font-weight:900;}
-.carousel-card .mini{opacity:.75;font-size:11px;}
-.carousel-card .mini-btn{
-  margin-top:auto;
-  width:100%;
-  border-radius:12px;
-  padding:10px;
-  font-weight:900;
-  background:var(--accent);
-  color:#000;
-  border:none;
-  cursor:pointer;
-}
-.carousel-card .mini-btn:hover{background:var(--accent-hover);}
-
-.car-btn{
-  position:absolute;
-  top:50%;
-  transform:translateY(-50%);
-  width:40px;height:40px;
-  border-radius:999px;
-  border:none;
-  cursor:pointer;
-  background:var(--accent);
-  color:#000;
-  font-weight:900;
-  box-shadow:0 10px 20px rgba(0,0,0,.25);
-  z-index:5;
-}
-.car-btn:hover{background:var(--accent-hover);}
-.car-btn.left{left:10px;}
-.car-btn.right{right:10px;}
-
-@media(max-width:520px){
-  .carousel-wrap{padding:0 46px;}
-  .car-btn{width:36px;height:36px;}
-}
-
-/* ===== GRID ===== */
-.grid{
-  display:grid;
-  grid-template-columns:repeat(6, 1fr);
-  gap:12px;
-}
-@media(max-width:1100px){ .grid{grid-template-columns:repeat(4, 1fr);} }
-@media(max-width:780px){ .grid{grid-template-columns:repeat(2, 1fr);} }
-@media(max-width:420px){ .grid{grid-template-columns:1fr;} }
-
-.card{
-  background:var(--panel-2);
-  border:1px solid var(--border);
-  border-radius:14px;
-  overflow:hidden;
-  display:flex;
-  flex-direction:column;
-  min-height:320px;
-}
-.card img{
-  width:100%;
-  height:150px;
-  object-fit:contain;
-  background:var(--img-bg);
-  border-bottom:1px solid var(--img-border);
-  padding:8px;
-}
-.card-body{
-  padding:10px;
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-  height:100%;
-}
-.card .name{font-weight:900;font-size:13px;line-height:1.2;}
-.card .desc{font-size:11px;opacity:.78;line-height:1.25;}
-.card .price{font-weight:900;}
-.card .extra{font-size:11px;opacity:.85;}
-.card .actions{
-  margin-top:auto;
-  display:flex;
-  gap:8px;
-}
-.card .actions button{
-  flex:1;
-  border:none;
-  cursor:pointer;
-  padding:10px 10px;
-  border-radius:12px;
-  font-weight:900;
-}
-.card .actions .details{background:var(--accent);color:#000;}
-.card .actions .details:hover{background:var(--accent-hover);}
-.card .actions .buy{
-  background:transparent;
-  border:1px solid var(--border);
-  color:var(--panel-text);
-}
-.card .actions .buy:hover{border-color:var(--accent);}
-
-/* ===== MODAL ===== */
-.modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.65);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  padding:16px;
-  z-index:999;
-}
-.modal.show{display:flex;}
-
-.modal-box{
-  width:min(980px, 100%);
-  max-height: calc(100dvh - 32px);
-  background:var(--panel);
-  color:var(--panel-text);
-  border-radius:18px;
-  border:1px solid var(--border);
-  box-shadow:0 20px 50px rgba(0,0,0,.35);
-  overflow-y:auto;
-  -webkit-overflow-scrolling: touch;
-  position:relative;
-}
-
-.modal-close{
-  position:sticky;
-  top:12px;
-  margin-left:auto;
-  margin-right:12px;
-  width:40px;height:40px;
-  border-radius:999px;
-  border:none;
-  background:var(--accent);
-  color:#000;
-  font-weight:900;
-  cursor:pointer;
-  z-index:10;
-}
-.modal-close:hover{background:var(--accent-hover);}
-
-.modal-content{
-  display:grid;
-  grid-template-columns: 1fr 1fr;
-  gap:14px;
-  padding:14px;
-}
-@media(max-width:900px){
-  .modal-content{grid-template-columns:1fr;}
-}
-
-.gallery{
-  background:var(--panel-2);
-  border:1px solid var(--border);
-  border-radius:16px;
-  padding:12px;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-.gallery-main{position:relative;}
-.gallery-main img{
-  width:100%;
-  height:320px;
-  object-fit:contain;
-  border-radius:14px;
-  background:var(--img-bg);
-  border:1px solid var(--img-border);
-  padding:10px;
-}
-.gbtn{
-  position:absolute;
-  top:50%;
-  transform:translateY(-50%);
-  width:42px;height:42px;
-  border-radius:999px;
-  border:none;
-  background:var(--accent);
-  color:#000;
-  font-weight:900;
-  cursor:pointer;
-  opacity:.95;
-}
-.gbtn:hover{background:var(--accent-hover);}
-.gbtn.left{left:10px;}
-.gbtn.right{right:10px;}
-.gbtn.disabled{opacity:.35; pointer-events:none;}
-
-.thumbs{
-  display:flex;
-  gap:8px;
-  overflow:auto;
-  padding-bottom:4px;
-}
-.thumbs img{
-  width:70px;height:70px;
-  object-fit:contain;
-  border-radius:12px;
-  border:2px solid transparent;
-  cursor:pointer;
-  background:var(--img-bg);
-  padding:6px;
-}
-.thumbs img.active{border-color:var(--accent);}
-
-.details-panel{
-  background:var(--panel-2);
-  border:1px solid var(--border);
-  border-radius:16px;
-  padding:12px;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-.details-panel .title{font-size:18px;font-weight:900;line-height:1.2;}
-.details-panel .price{font-size:22px;font-weight:900;}
-.details-panel .extra{opacity:.9;}
-.details-panel .buy{
-  margin-top:6px;
-  padding:12px 14px;
-  border-radius:14px;
-  border:none;
-  cursor:pointer;
-  background:var(--accent);
-  color:#000;
-  font-weight:900;
-  font-size:15px;
-}
-.details-panel .buy:hover{background:var(--accent-hover);}
-
-.desc-box{
-  background:var(--panel);
-  border-top:1px solid var(--border);
-  padding:14px;
-}
-.desc-box h3{font-weight:900;margin-bottom:8px;}
-.desc-box ul{padding-left:18px;line-height:1.35;}
-.desc-box li{margin-bottom:6px;}
-</style>
-</head>
-
-<body>
-
-<!-- TOPBAR -->
-<div class="topbar">
-  <div class="brand">
-    <div class="logo">KT</div>
-    <h1>Loja Kalthira</h1>
-  </div>
-
-  <div class="actions">
-    <div class="search">
-      <i class="fa fa-magnifying-glass"></i>
-      <input id="searchInput" type="text" placeholder="Pesquisar produto..." oninput="filtrarPesquisa()">
-    </div>
-    <button class="theme-toggle" onclick="toggleTheme()">🌗 Tema</button>
-  </div>
-</div>
-
-<!-- FILTROS -->
-<div class="filters">
-  <!-- ✅ só fica o botão do menu -->
-  <div class="categories">
-    <div class="cat-menu-wrap">
-      <button class="cat-menu-btn" id="catMenuBtn" type="button" onclick="toggleCatMenu()">
-        <i class="fa-solid fa-bars"></i> Categorias
-      </button>
-
-      <div class="cat-menu" id="catMenu" role="menu" aria-label="Menu de categorias">
-        <div class="menu-title">Escolha uma categoria</div>
-        <div class="menu-grid" id="catMenuList">
-          <!-- preenchido pelo JS -->
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="price-box">
-    <div class="price-top">
-      <div class="price-title"><i class="fa-solid fa-sliders"></i> Filtro de preço</div>
-      <div class="price-value">R$ <span id="precoLabel">2000</span></div>
-    </div>
-    <div class="price-sub">Arraste para ver produtos até esse valor.</div>
-    <input type="range" id="precoSlider" min="0" max="2000" step="10" value="2000" oninput="filtrarPreco()">
-  </div>
-</div>
-
-<div class="main">
-
-  <!-- HERO -->
-  <div class="hero">
-    <div class="hero-left">
-      <h2>Bem-vindo(a) à Loja Kalthira</h2>
-      <p>Um cantinho simples com produtos e links organizados pra você.</p>
-
-      <div class="cta">
-        <a class="btn primary" href="https://t.me/+wbXlTeQ_ZjczNjlh" target="_blank">Entrar no Telegram</a>
-        <button class="btn ghost" onclick="scrollToProdutos()">Ver produtos</button>
-      </div>
-
-      <div class="small-note">Dica: use as categorias, o filtro de preço e a pesquisa pra achar mais rápido.</div>
-    </div>
-
-    <div class="social-icons" aria-label="Redes sociais">
-      <a href="https://www.instagram.com/loja_kalthira/" target="_blank" rel="noopener noreferrer" title="Instagram">
-        <i class="fab fa-instagram"></i>
-      </a>
-      <a href="https://t.me/+wbXlTeQ_ZjczNjlh" target="_blank" rel="noopener noreferrer" title="Telegram">
-        <i class="fab fa-telegram"></i>
-      </a>
-      <a href="https://facebook.com/LojaKalthira/" target="_blank" rel="noopener noreferrer" title="Facebook">
-        <i class="fab fa-facebook"></i>
-      </a>
-    </div>
-  </div>
-
-  <!-- RECENTES -->
-  <div class="section" id="recentSection">
-    <div class="section-title">Produto adicionado recentemente</div>
-    <div class="carousel-wrap">
-      <button class="car-btn left" onclick="scrollRecent(-1)" aria-label="Voltar">&lt;</button>
-      <div class="carousel" id="recentCarousel"></div>
-      <button class="car-btn right" onclick="scrollRecent(1)" aria-label="Avançar">&gt;</button>
-    </div>
-  </div>
-
-  <!-- GRID -->
-  <div class="section" id="produtosSection">
-    <div class="section-title">Produtos</div>
-    <div class="grid" id="produtosGrid"></div>
-  </div>
-
-</div>
-
-<!-- backdrop do menu de categorias -->
-<div class="cat-backdrop" id="catBackdrop" onclick="closeCatMenu()"></div>
-
-<!-- MODAL -->
-<div class="modal" id="modal">
-  <div class="modal-box" role="dialog" aria-modal="true">
-    <button class="modal-close" onclick="fecharModal()">X</button>
-
-    <div class="modal-content">
-      <div class="gallery">
-        <div class="gallery-main">
-          <button class="gbtn left"  id="gPrev" onclick="trocarImagem(-1)"><i class="fa-solid fa-chevron-left"></i></button>
-          <img id="gMain" src="" alt="Imagem do produto">
-          <button class="gbtn right" id="gNext" onclick="trocarImagem(1)"><i class="fa-solid fa-chevron-right"></i></button>
-        </div>
-        <div class="thumbs" id="gThumbs"></div>
-        <div class="small-note">Se o produto tiver mais imagens, use as setas.</div>
-      </div>
-
-      <div class="details-panel">
-        <div class="title" id="mTitle"></div>
-        <div class="price" id="mPrice"></div>
-        <div class="extra" id="mExtra"></div>
-        <button class="buy" id="mBuy">Comprar</button>
-        <div class="small-note">Você será direcionado para o Mercado Livre.</div>
-      </div>
-    </div>
-
-    <div class="desc-box">
-      <h3>Descrição do produto</h3>
-      <ul id="mDesc"></ul>
-    </div>
-  </div>
-</div>
-
 <script>
+/* =========================
+   CONFIG
+========================= */
 const CATEGORIAS = [
   { id:"todos", label:"Todos" },
   { id:"eletronicos", label:"Eletrônicos" },
@@ -764,96 +11,151 @@ const CATEGORIAS = [
   { id:"casa", label:"Casa" },
 ];
 
-const produtos = [
-  {
-    nome: "Câmera De Vídeo Wi-Fi Intelbras IM3 C MicroSD 32GB Branco",
-    categoria: "seguranca",
-    preco: 239,
-    precoText: "R$ 239",
-    extra: "6x de R$ 39,83 sem juros",
-    link: "https://www.mercadolivre.com.br/cmera-de-video-wi-fi-intelbras-im3-c-microsd-32gb-branco/p/MLB23409605?pdp_filters=item_id%3AMLB4077829432#polycard_client=affiliates&wid=MLB4077829432&sid=affiliates",
-    imagem: "https://http2.mlstatic.com/D_Q_NP_849785-MLA88970380283_072025-F.webp",
-    imagens: [
-      "https://http2.mlstatic.com/D_Q_NP_849785-MLA88970380283_072025-F.webp"
-    ],
-    desc: [
-      "Unidades por kit: 1",
-      "Compatível com Alexa e Google Assistente",
-      "Conexão Wi-Fi e imagem Full HD",
-      "Visão noturna e acesso remoto",
-      "Notificação por movimento"
-    ],
-    addedAt: "2026-02-20"
-  },
-  {
-    nome: "Smartphone Motorola Moto g35 5G — 256GB (RAM Boost)",
-    categoria: "eletronicos",
-    preco: 989.10,
-    precoText: "R$ 989,10",
-    extra: "ou R$ 1.099 em 10x de R$ 109,90 sem juros",
-    link: "https://www.mercadolivre.com.br/smartphone-motorola-moto-g35-5g-256gb-12gb-4gb-ram8gb-ram-boost-e-camera-50mp-com-ai-nfc-tela-67-com-superbrilho-cinza/p/MLB41998152?pdp_filters=item_id%3AMLB3953571145#polycard_client=affiliates&wid=MLB3953571145&sid=affiliates",
-    imagem: "https://http2.mlstatic.com/D_Q_NP_743327-MLA99452274448_112025-F.webp",
-    imagens: [
-      "https://http2.mlstatic.com/D_Q_NP_743327-MLA99452274448_112025-F.webp"
-    ],
-    desc: ["Compatível com redes 5G","Tela de 6.7","Memória interna de 256GB","Som com Dolby Atmos"],
-    addedAt: "2026-02-19"
-  },
-  {
-    nome: "Celular Samsung Galaxy A07 — 256GB",
-    categoria: "eletronicos",
-    preco: 989.10,
-    precoText: "R$ 989,10",
-    extra: "ou R$ 1.099 em 10x de R$ 109,90 sem juros",
-    link: "https://www.mercadolivre.com.br/celular-samsung-galaxy-a07-256gb-8gb-cmera-50mp-tela-67-proteco-ip54-processador-6nm-preto/p/MLB54961556",
-    imagem: "https://http2.mlstatic.com/D_Q_NP_895724-MLA91526198522_092025-F.webp",
-    imagens: [
-      "https://http2.mlstatic.com/D_Q_NP_895724-MLA91526198522_092025-F.webp"
-    ],
-    desc: ["Tela PLS LCD de 6.7","Câmera traseira de 50MP","Bateria de 5000mAh","Resistente à água e poeira"],
-    addedAt: "2026-02-18"
-  },
-  {
-    nome: "Cadeira de escritório Delta Boss gamer",
-    categoria: "gamer",
-    preco: 237.99,
-    precoText: "R$ 237,99",
-    extra: "ou 6x R$ 39,66 sem juros",
-    link: "https://www.mercadolivre.com.br/cadeira-de-escritorio-delta-boss-gamer-ergonmica-preta-com-estofado-de-malha/p/MLB19047858?offer_type=BEST_INSTALLMENTS",
-    imagem: "https://http2.mlstatic.com/D_Q_NP_761829-MLA95666829898_102025-F.webp",
-    imagens: [
-      "https://http2.mlstatic.com/D_Q_NP_898497-MLA49692821708_042022-F.webp",
-      "https://http2.mlstatic.com/D_Q_NP_761829-MLA95666829898_102025-F.webp"
-    ],
-    desc: ["Unidades por kit: 1","Material do estofamento: Malha","Cor principal: Preto","Altura do encosto: 71 cm","Largura do assento: 61 cm","Altura mínima do chão ao assento: 42 cm","Com apoio de braços: Sim","É ergonômica: Sim"],
-    addedAt: "2026-02-21"
-  },
-  {
-  nome: "Smartphone Motorola Moto G06 - 128gb 12gb (4gb Ram + 8gb Ram Boost)",
-  categoria: "eletronicos",
-  preco: 595.90,
-  precoText: "R$ 595,90",
-  extra: "ou R$ 662,11 em 10x de R$ 66,21 sem juros",
-  link: "https://mercadolivre.com/sec/2YLvsaE",
-  imagem: "https://http2.mlstatic.com/D_Q_NP_733476-MLA104760588263_012026-F.webp",
+/* =========================
+   ✅ SISTEMA MELHORADO DE PRODUTOS
+   - adicionarProduto({...}) simplifica cadastro
+   - gera precoText e addedAt automaticamente
+========================= */
+const produtos = [];
+
+/* formata preço em BRL */
+function formatarPrecoBR(valor){
+  return "R$ " + Number(valor).toLocaleString("pt-BR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+}
+
+/* data local no formato AAAA-MM-DD */
+function hojeISO(){
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+/* helper principal para cadastrar produto */
+function adicionarProduto(dados){
+  if(!dados || typeof dados !== "object") return;
+
+  const produto = {
+    nome: dados.nome || "Produto sem nome",
+    categoria: dados.categoria || "eletronicos",
+    preco: Number(dados.preco ?? 0),
+    precoText: dados.precoText || formatarPrecoBR(Number(dados.preco ?? 0)),
+    extra: dados.extra || "",
+    link: dados.link || "#",
+    imagem: dados.imagem || "",
+    imagens: Array.isArray(dados.imagens) && dados.imagens.length
+      ? dados.imagens
+      : (dados.imagem ? [dados.imagem] : []),
+    desc: Array.isArray(dados.desc) ? dados.desc : [],
+    addedAt: dados.addedAt || hojeISO()
+  };
+
+  produtos.push(produto);
+  return produto;
+}
+
+/* (opcional) adicionar vários de uma vez */
+function adicionarProdutos(lista){
+  if(!Array.isArray(lista)) return;
+  lista.forEach(adicionarProduto);
+}
+
+adicionarProduto({
+  nome: "Câmera De Vídeo Wi-Fi Intelbras IM3 C MicroSD 32GB Branco",
+  categoria: "seguranca",
+  preco: 239,
+  extra: "6x de R$ 39,83 sem juros",
+  link: "https://www.mercadolivre.com.br/cmera-de-video-wi-fi-intelbras-im3-c-microsd-32gb-branco/p/MLB23409605?pdp_filters=item_id%3AMLB4077829432#polycard_client=affiliates&wid=MLB4077829432&sid=affiliates",
+  imagem: "https://http2.mlstatic.com/D_Q_NP_849785-MLA88970380283_072025-F.webp",
   imagens: [
-    "https://http2.mlstatic.com/D_Q_NP_733476-MLA104760588263_012026-F.webp",
-    "https://http2.mlstatic.com/D_Q_NP_733476-MLA104760588263_012026-F.webp"
+    "https://http2.mlstatic.com/D_Q_NP_849785-MLA88970380283_072025-F.webp"
   ],
   desc: [
-    "Memória RAM: 4 GB.",
-    "Dispositivo desbloqueado para que você escolha a companhia telefônica de sua preferência.",
-    "Tela IPS de 6.9",
-    "Câmera frontal de 8Mpx.",
-    "Processador Helio G81 Extreme Octa-Core de 2GHz com 4GB de RAM.",
-    "Bateria de 5.2 Ah.",
-    "Memória interna de 128GB.",
-    "Com reconhecimento facial e sensor de impressão digital."],
-  addedAt: "2026-02-22"
-  }
-  
-];
+    "Unidades por kit: 1",
+    "Compatível com Alexa e Google Assistente",
+    "Conexão Wi-Fi e imagem Full HD",
+    "Visão noturna e acesso remoto",
+    "Notificação por movimento"
+  ],
+  addedAt: "2026-02-20"
+});
 
+adicionarProduto({
+  nome: "Smartphone Motorola Moto g35 5G — 256GB (RAM Boost)",
+  categoria: "eletronicos",
+  preco: 989.10,
+  extra: "ou R$ 1.099 em 10x de R$ 109,90 sem juros",
+  link: "https://www.mercadolivre.com.br/smartphone-motorola-moto-g35-5g-256gb-12gb-4gb-ram8gb-ram-boost-e-camera-50mp-com-ai-nfc-tela-67-com-superbrilho-cinza/p/MLB41998152?pdp_filters=item_id%3AMLB3953571145#polycard_client=affiliates&wid=MLB3953571145&sid=affiliates",
+  imagem: "https://http2.mlstatic.com/D_Q_NP_743327-MLA99452274448_112025-F.webp",
+  imagens: [
+    "https://http2.mlstatic.com/D_Q_NP_743327-MLA99452274448_112025-F.webp"
+  ],
+  desc: [
+    "Compatível com redes 5G",
+    "Tela de 6.7",
+    "Memória interna de 256GB",
+    "Som com Dolby Atmos"
+  ],
+  addedAt: "2026-02-19"
+});
+
+adicionarProduto({
+  nome: "Celular Samsung Galaxy A07 — 256GB",
+  categoria: "eletronicos",
+  preco: 989.10,
+  extra: "ou R$ 1.099 em 10x de R$ 109,90 sem juros",
+  link: "https://www.mercadolivre.com.br/celular-samsung-galaxy-a07-256gb-8gb-cmera-50mp-tela-67-proteco-ip54-processador-6nm-preto/p/MLB54961556",
+  imagem: "https://http2.mlstatic.com/D_Q_NP_895724-MLA91526198522_092025-F.webp",
+  imagens: [
+    "https://http2.mlstatic.com/D_Q_NP_895724-MLA91526198522_092025-F.webp"
+  ],
+  desc: [
+    "Tela PLS LCD de 6.7",
+    "Câmera traseira de 50MP",
+    "Bateria de 5000mAh",
+    "Resistente à água e poeira"
+  ],
+  addedAt: "2026-02-18"
+});
+
+adicionarProduto({
+  nome: "Cadeira de escritório Delta Boss gamer",
+  categoria: "gamer",
+  preco: 237.99,
+  extra: "ou 6x R$ 39,66 sem juros",
+  link: "https://www.mercadolivre.com.br/cadeira-de-escritorio-delta-boss-gamer-ergonmica-preta-com-estofado-de-malha/p/MLB19047858?offer_type=BEST_INSTALLMENTS",
+  imagem: "https://http2.mlstatic.com/D_Q_NP_761829-MLA95666829898_102025-F.webp",
+  imagens: [
+    "https://http2.mlstatic.com/D_Q_NP_898497-MLA49692821708_042022-F.webp",
+    "https://http2.mlstatic.com/D_Q_NP_761829-MLA95666829898_102025-F.webp"
+  ],
+  desc: [
+    "Unidades por kit: 1",
+    "Material do estofamento: Malha",
+    "Cor principal: Preto",
+    "Altura do encosto: 71 cm",
+    "Largura do assento: 61 cm",
+    "Altura mínima do chão ao assento: 42 cm",
+    "Com apoio de braços: Sim",
+    "É ergonômica: Sim"
+  ],
+  addedAt: "2026-02-21"
+});
+
+/* =========================
+✅ CADASTRO DOS PRODUTOS (AGORA FICA MAIS FÁCIL)
+Adicione novos itens aqui usando adicionarProduto(...)
+========================= */
+
+  
+  
+/* =========================
+   ESTADO
+========================= */
 let categoriaAtual = "todos";
 let precoMax = 2000;
 let pesquisa = "";
@@ -897,7 +199,9 @@ function renderCatMenu(){
   });
 }
 
-/* ========================= */
+/* =========================
+   FILTROS / GRID
+========================= */
 function getFiltrados(){
   return produtos.filter(p => {
     const okCat = (categoriaAtual === "todos" || p.categoria === categoriaAtual);
@@ -910,6 +214,15 @@ function getFiltrados(){
 function renderGrid(){
   grid.innerHTML = "";
   const filtrados = getFiltrados();
+
+  if(filtrados.length === 0){
+    grid.innerHTML = `
+      <div style="grid-column:1/-1; padding:16px; border:1px solid var(--border); border-radius:14px; background:var(--panel-2);">
+        Nenhum produto encontrado com os filtros atuais.
+      </div>
+    `;
+    return;
+  }
 
   filtrados.forEach(p => {
     const card = document.createElement("div");
@@ -982,7 +295,7 @@ function atualizarVisibilidadeRecentes(){
 
 function filtrar(cat){
   categoriaAtual = cat;
-  renderCatMenu();               // ✅ atualiza ativo no menu
+  renderCatMenu();
   atualizarVisibilidadeRecentes();
   renderGrid();
 }
@@ -998,7 +311,9 @@ function filtrarPesquisa(){
   renderGrid();
 }
 
-/* ===== MODAL ===== */
+/* =========================
+   MODAL
+========================= */
 let modalIndex = -1;
 let galleryIndex = 0;
 
@@ -1114,13 +429,18 @@ function escapeHtml(str){
     .replaceAll("'","&#039;");
 }
 
+/* =========================
+   DICA PRÁTICA (uso no console)
+   Você pode colar isso no console e atualizar:
+   adicionarProduto({ nome:"...", categoria:"gamer", preco:99.9, link:"...", imagem:"..." });
+   renderRecent(); renderGrid(); atualizarVisibilidadeRecentes();
+========================= */
+window.adicionarProduto = adicionarProduto;
+
 /* INIT */
 precoLabel.textContent = precoSlider.value;
-renderCatMenu();        // ✅ cria o menu
+renderCatMenu();
 renderRecent();
 renderGrid();
 atualizarVisibilidadeRecentes();
 </script>
-
-</body>
-</html>
