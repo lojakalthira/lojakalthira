@@ -1,7 +1,4 @@
 <script>
-/* =========================
-   CONFIG
-========================= */
 const CATEGORIAS = [
   { id:"todos", label:"Todos" },
   { id:"eletronicos", label:"Eletrônicos" },
@@ -13,20 +10,17 @@ const CATEGORIAS = [
 
 /* =========================
    ✅ SISTEMA MELHORADO DE PRODUTOS
-   - adicionarProduto({...}) simplifica cadastro
-   - gera precoText e addedAt automaticamente
+   - addProduto(obj)
+   - addProdutos([obj1, obj2...])
+   - preenche campos automáticos
 ========================= */
 const produtos = [];
 
-/* formata preço em BRL */
 function formatarPrecoBR(valor){
-  return "R$ " + Number(valor).toLocaleString("pt-BR", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  });
+  const n = Number(valor || 0);
+  return "R$ " + n.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-/* data local no formato AAAA-MM-DD */
 function hojeISO(){
   const d = new Date();
   const y = d.getFullYear();
@@ -35,127 +29,153 @@ function hojeISO(){
   return `${y}-${m}-${day}`;
 }
 
-/* helper principal para cadastrar produto */
-function adicionarProduto(dados){
-  if(!dados || typeof dados !== "object") return;
+function normalizarDesc(desc){
+  if (Array.isArray(desc)) return desc.filter(Boolean).map(x => String(x).trim()).filter(Boolean);
+  if (typeof desc === "string") {
+    // pode separar por |, ; ou quebra de linha
+    return desc
+      .split(/\||;|\n/g)
+      .map(x => x.trim())
+      .filter(Boolean);
+  }
+  return [];
+}
 
-  const produto = {
-    nome: dados.nome || "Produto sem nome",
-    categoria: dados.categoria || "eletronicos",
-    preco: Number(dados.preco ?? 0),
-    precoText: dados.precoText || formatarPrecoBR(Number(dados.preco ?? 0)),
-    extra: dados.extra || "",
-    link: dados.link || "#",
-    imagem: dados.imagem || "",
-    imagens: Array.isArray(dados.imagens) && dados.imagens.length
-      ? dados.imagens
-      : (dados.imagem ? [dados.imagem] : []),
-    desc: Array.isArray(dados.desc) ? dados.desc : [],
-    addedAt: dados.addedAt || hojeISO()
+function categoriaValida(cat){
+  return CATEGORIAS.some(c => c.id === cat && c.id !== "todos");
+}
+
+function addProduto(prod){
+  if (!prod || typeof prod !== "object") {
+    console.warn("Produto inválido:", prod);
+    return;
+  }
+
+  const precoNum = Number(prod.preco);
+  const categoria = String(prod.categoria || "").trim();
+
+  if (!prod.nome) {
+    console.warn("Produto sem nome:", prod);
+    return;
+  }
+  if (!categoriaValida(categoria)) {
+    console.warn(`Categoria inválida: "${categoria}". Use: eletronicos | seguranca | saude | gamer | casa`);
+    return;
+  }
+  if (Number.isNaN(precoNum)) {
+    console.warn(`Preço inválido no produto "${prod.nome}"`);
+    return;
+  }
+  if (!prod.link) {
+    console.warn(`Produto "${prod.nome}" sem link`);
+    return;
+  }
+  if (!prod.imagem) {
+    console.warn(`Produto "${prod.nome}" sem imagem`);
+    return;
+  }
+
+  const imagens = Array.isArray(prod.imagens) && prod.imagens.length
+    ? prod.imagens.filter(Boolean)
+    : [prod.imagem];
+
+  const produtoFinal = {
+    nome: String(prod.nome).trim(),
+    categoria,
+    preco: precoNum,
+    precoText: prod.precoText ? String(prod.precoText) : formatarPrecoBR(precoNum),
+    extra: prod.extra ? String(prod.extra) : "",
+    link: String(prod.link).trim(),
+    imagem: String(prod.imagem).trim(),
+    imagens,
+    desc: normalizarDesc(prod.desc),
+    addedAt: prod.addedAt ? String(prod.addedAt) : hojeISO()
   };
 
-  produtos.push(produto);
-  return produto;
+  produtos.push(produtoFinal);
 }
 
-/* (opcional) adicionar vários de uma vez */
-function adicionarProdutos(lista){
-  if(!Array.isArray(lista)) return;
-  lista.forEach(adicionarProduto);
+function addProdutos(lista){
+  if (!Array.isArray(lista)) return;
+  lista.forEach(addProduto);
 }
 
-adicionarProduto({
-  nome: "Câmera De Vídeo Wi-Fi Intelbras IM3 C MicroSD 32GB Branco",
-  categoria: "seguranca",
-  preco: 239,
-  extra: "6x de R$ 39,83 sem juros",
-  link: "https://www.mercadolivre.com.br/cmera-de-video-wi-fi-intelbras-im3-c-microsd-32gb-branco/p/MLB23409605?pdp_filters=item_id%3AMLB4077829432#polycard_client=affiliates&wid=MLB4077829432&sid=affiliates",
-  imagem: "https://http2.mlstatic.com/D_Q_NP_849785-MLA88970380283_072025-F.webp",
-  imagens: [
-    "https://http2.mlstatic.com/D_Q_NP_849785-MLA88970380283_072025-F.webp"
-  ],
-  desc: [
-    "Unidades por kit: 1",
-    "Compatível com Alexa e Google Assistente",
-    "Conexão Wi-Fi e imagem Full HD",
-    "Visão noturna e acesso remoto",
-    "Notificação por movimento"
-  ],
-  addedAt: "2026-02-20"
-});
-
-adicionarProduto({
-  nome: "Smartphone Motorola Moto g35 5G — 256GB (RAM Boost)",
-  categoria: "eletronicos",
-  preco: 989.10,
-  extra: "ou R$ 1.099 em 10x de R$ 109,90 sem juros",
-  link: "https://www.mercadolivre.com.br/smartphone-motorola-moto-g35-5g-256gb-12gb-4gb-ram8gb-ram-boost-e-camera-50mp-com-ai-nfc-tela-67-com-superbrilho-cinza/p/MLB41998152?pdp_filters=item_id%3AMLB3953571145#polycard_client=affiliates&wid=MLB3953571145&sid=affiliates",
-  imagem: "https://http2.mlstatic.com/D_Q_NP_743327-MLA99452274448_112025-F.webp",
-  imagens: [
-    "https://http2.mlstatic.com/D_Q_NP_743327-MLA99452274448_112025-F.webp"
-  ],
-  desc: [
-    "Compatível com redes 5G",
-    "Tela de 6.7",
-    "Memória interna de 256GB",
-    "Som com Dolby Atmos"
-  ],
-  addedAt: "2026-02-19"
-});
-
-adicionarProduto({
-  nome: "Celular Samsung Galaxy A07 — 256GB",
-  categoria: "eletronicos",
-  preco: 989.10,
-  extra: "ou R$ 1.099 em 10x de R$ 109,90 sem juros",
-  link: "https://www.mercadolivre.com.br/celular-samsung-galaxy-a07-256gb-8gb-cmera-50mp-tela-67-proteco-ip54-processador-6nm-preto/p/MLB54961556",
-  imagem: "https://http2.mlstatic.com/D_Q_NP_895724-MLA91526198522_092025-F.webp",
-  imagens: [
-    "https://http2.mlstatic.com/D_Q_NP_895724-MLA91526198522_092025-F.webp"
-  ],
-  desc: [
-    "Tela PLS LCD de 6.7",
-    "Câmera traseira de 50MP",
-    "Bateria de 5000mAh",
-    "Resistente à água e poeira"
-  ],
-  addedAt: "2026-02-18"
-});
-
-adicionarProduto({
-  nome: "Cadeira de escritório Delta Boss gamer",
-  categoria: "gamer",
-  preco: 237.99,
-  extra: "ou 6x R$ 39,66 sem juros",
-  link: "https://www.mercadolivre.com.br/cadeira-de-escritorio-delta-boss-gamer-ergonmica-preta-com-estofado-de-malha/p/MLB19047858?offer_type=BEST_INSTALLMENTS",
-  imagem: "https://http2.mlstatic.com/D_Q_NP_761829-MLA95666829898_102025-F.webp",
-  imagens: [
-    "https://http2.mlstatic.com/D_Q_NP_898497-MLA49692821708_042022-F.webp",
-    "https://http2.mlstatic.com/D_Q_NP_761829-MLA95666829898_102025-F.webp"
-  ],
-  desc: [
-    "Unidades por kit: 1",
-    "Material do estofamento: Malha",
-    "Cor principal: Preto",
-    "Altura do encosto: 71 cm",
-    "Largura do assento: 61 cm",
-    "Altura mínima do chão ao assento: 42 cm",
-    "Com apoio de braços: Sim",
-    "É ergonômica: Sim"
-  ],
-  addedAt: "2026-02-21"
-});
+/* =========================
+   ✅ SEUS PRODUTOS (agora mais fácil de cadastrar)
+   Você pode continuar usando no estilo antigo também.
+========================= */
+addProdutos([
+  {
+    nome: "Câmera De Vídeo Wi-Fi Intelbras IM3 C MicroSD 32GB Branco",
+    categoria: "seguranca",
+    preco: 239,
+    extra: "6x de R$ 39,83 sem juros",
+    link: "https://www.mercadolivre.com.br/cmera-de-video-wi-fi-intelbras-im3-c-microsd-32gb-branco/p/MLB23409605?pdp_filters=item_id%3AMLB4077829432#polycard_client=affiliates&wid=MLB4077829432&sid=affiliates",
+    imagem: "https://http2.mlstatic.com/D_Q_NP_849785-MLA88970380283_072025-F.webp",
+    imagens: [
+      "https://http2.mlstatic.com/D_Q_NP_849785-MLA88970380283_072025-F.webp"
+    ],
+    desc: [
+      "Unidades por kit: 1",
+      "Compatível com Alexa e Google Assistente",
+      "Conexão Wi-Fi e imagem Full HD",
+      "Visão noturna e acesso remoto",
+      "Notificação por movimento"
+    ],
+    addedAt: "2026-02-20"
+  },
+  {
+    nome: "Smartphone Motorola Moto g35 5G — 256GB (RAM Boost)",
+    categoria: "eletronicos",
+    preco: 989.10,
+    extra: "ou R$ 1.099 em 10x de R$ 109,90 sem juros",
+    link: "https://www.mercadolivre.com.br/smartphone-motorola-moto-g35-5g-256gb-12gb-4gb-ram8gb-ram-boost-e-camera-50mp-com-ai-nfc-tela-67-com-superbrilho-cinza/p/MLB41998152?pdp_filters=item_id%3AMLB3953571145#polycard_client=affiliates&wid=MLB3953571145&sid=affiliates",
+    imagem: "https://http2.mlstatic.com/D_Q_NP_743327-MLA99452274448_112025-F.webp",
+    desc: "Compatível com redes 5G | Tela de 6.7 | Memória interna de 256GB | Som com Dolby Atmos",
+    addedAt: "2026-02-19"
+  },
+  {
+    nome: "Celular Samsung Galaxy A07 — 256GB",
+    categoria: "eletronicos",
+    preco: 989.10,
+    extra: "ou R$ 1.099 em 10x de R$ 109,90 sem juros",
+    link: "https://www.mercadolivre.com.br/celular-samsung-galaxy-a07-256gb-8gb-cmera-50mp-tela-67-proteco-ip54-processador-6nm-preto/p/MLB54961556",
+    imagem: "https://http2.mlstatic.com/D_Q_NP_895724-MLA91526198522_092025-F.webp",
+    desc: ["Tela PLS LCD de 6.7","Câmera traseira de 50MP","Bateria de 5000mAh","Resistente à água e poeira"],
+    addedAt: "2026-02-18"
+  },
+  {
+    nome: "Cadeira de escritório Delta Boss gamer",
+    categoria: "gamer",
+    preco: 237.99,
+    extra: "ou 6x R$ 39,66 sem juros",
+    link: "https://www.mercadolivre.com.br/cadeira-de-escritorio-delta-boss-gamer-ergonmica-preta-com-estofado-de-malha/p/MLB19047858?offer_type=BEST_INSTALLMENTS",
+    imagem: "https://http2.mlstatic.com/D_Q_NP_761829-MLA95666829898_102025-F.webp",
+    imagens: [
+      "https://http2.mlstatic.com/D_Q_NP_898497-MLA49692821708_042022-F.webp",
+      "https://http2.mlstatic.com/D_Q_NP_761829-MLA95666829898_102025-F.webp"
+    ],
+    desc: ["Unidades por kit: 1","Material do estofamento: Malha","Cor principal: Preto","Altura do encosto: 71 cm","Largura do assento: 61 cm","Altura mínima do chão ao assento: 42 cm","Com apoio de braços: Sim","É ergonômica: Sim"],
+    addedAt: "2026-02-21"
+  }
+]);
 
 /* =========================
-✅ CADASTRO DOS PRODUTOS (AGORA FICA MAIS FÁCIL)
-Adicione novos itens aqui usando adicionarProduto(...)
+   ✅ EXEMPLO DE COMO ADICIONAR NOVO PRODUTO (mais simples)
+   (pode apagar este exemplo depois)
 ========================= */
+// addProduto({
+//   nome: "Mouse Gamer RGB 7200 DPI",
+//   categoria: "gamer",
+//   preco: 129.90,
+//   extra: "ou 12x de R$ 12,66",
+//   link: "https://seu-link-aqui.com",
+//   imagem: "https://sua-imagem-aqui.webp",
+//   // imagens: ["https://img1.webp", "https://img2.webp"], // opcional
+//   desc: "RGB | 7200 DPI | Cabo reforçado | 7 botões",
+//   // addedAt: "2026-02-23" // opcional (se não passar, usa data de hoje)
+// });
 
-  
-  
-/* =========================
-   ESTADO
-========================= */
 let categoriaAtual = "todos";
 let precoMax = 2000;
 let pesquisa = "";
@@ -199,9 +219,7 @@ function renderCatMenu(){
   });
 }
 
-/* =========================
-   FILTROS / GRID
-========================= */
+/* ========================= */
 function getFiltrados(){
   return produtos.filter(p => {
     const okCat = (categoriaAtual === "todos" || p.categoria === categoriaAtual);
@@ -215,10 +233,10 @@ function renderGrid(){
   grid.innerHTML = "";
   const filtrados = getFiltrados();
 
-  if(filtrados.length === 0){
+  if (filtrados.length === 0) {
     grid.innerHTML = `
-      <div style="grid-column:1/-1; padding:16px; border:1px solid var(--border); border-radius:14px; background:var(--panel-2);">
-        Nenhum produto encontrado com os filtros atuais.
+      <div style="grid-column:1/-1; padding:20px; border:1px dashed var(--border); border-radius:14px; text-align:center; opacity:.85;">
+        Nenhum produto encontrado com esses filtros.
       </div>
     `;
     return;
@@ -301,7 +319,7 @@ function filtrar(cat){
 }
 
 function filtrarPreco(){
-  precoMax = precoSlider.value;
+  precoMax = Number(precoSlider.value);
   precoLabel.textContent = precoMax;
   renderGrid();
 }
@@ -311,9 +329,7 @@ function filtrarPesquisa(){
   renderGrid();
 }
 
-/* =========================
-   MODAL
-========================= */
+/* ===== MODAL ===== */
 let modalIndex = -1;
 let galleryIndex = 0;
 
@@ -378,6 +394,10 @@ function renderGallery(imgs){
   const many = imgs.length > 1;
   gPrev.classList.toggle("disabled", !many);
   gNext.classList.toggle("disabled", !many);
+
+  // ✅ garante seta correta visualmente
+  gPrev.innerHTML = "&lt;";
+  gNext.innerHTML = "&gt;";
 }
 
 function trocarImagem(dir){
@@ -428,14 +448,6 @@ function escapeHtml(str){
     .replaceAll('"',"&quot;")
     .replaceAll("'","&#039;");
 }
-
-/* =========================
-   DICA PRÁTICA (uso no console)
-   Você pode colar isso no console e atualizar:
-   adicionarProduto({ nome:"...", categoria:"gamer", preco:99.9, link:"...", imagem:"..." });
-   renderRecent(); renderGrid(); atualizarVisibilidadeRecentes();
-========================= */
-window.adicionarProduto = adicionarProduto;
 
 /* INIT */
 precoLabel.textContent = precoSlider.value;
