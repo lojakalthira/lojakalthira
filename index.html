@@ -1,458 +1,302 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loja Kalthira</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+:root{
+  --bg:#000;
+  --card:#111;
+  --border:#2a2a2a;
+  --text:#fff;
+  --accent:#00ffcc;
+  --accent-hover:#00e6b8;
+  --radius:12px;
+}
+
+body.light{
+  --bg:#f4f4f4;
+  --card:#ffffff;
+  --border:#dddddd;
+  --text:#111;
+  --accent:#0077ff;
+  --accent-hover:#005fcc;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+  font-family:Arial, sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  transition:.3s;
+  display:flex;
+  flex-direction:column;
+  min-height:100vh;
+}
+
+/* MENU TOPO */
+.topbar{
+  width:100%;
+  background:var(--card);
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 20px;
+  flex-wrap:wrap;
+}
+
+.topbar .logo{
+  font-size:28px;
+  font-weight:bold;
+  color:var(--accent);
+  letter-spacing:1px;
+}
+
+.topbar .theme-toggle{
+  cursor:pointer;
+  font-size:14px;
+  color:var(--accent);
+  transition:.2s;
+}
+.topbar .theme-toggle:hover{
+  color:var(--accent-hover);
+}
+
+/* CATEGORIAS TOPO */
+.topbar .categories{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:5px;
+}
+.topbar .categories button{
+  padding:8px 12px;
+  border:none;
+  border-radius:var(--radius);
+  background:linear-gradient(145deg, #111, #222);
+  color:var(--accent);
+  cursor:pointer;
+  font-size:13px;
+  font-weight:bold;
+  transition:.3s;
+  position:relative;
+  overflow:hidden;
+  box-shadow: 0 0 5px #000;
+}
+.topbar .categories button::after{
+  content:"";
+  position:absolute;
+  top:0;
+  left:-100%;
+  width:100%;
+  height:100%;
+  background:var(--accent);
+  opacity:0.2;
+  transition:.4s;
+}
+.topbar .categories button:hover::after{
+  left:0;
+}
+.topbar .categories button:hover{
+  color:#000;
+  font-weight:bold;
+  box-shadow:0 0 12px var(--accent);
+  background:var(--accent-hover);
+}
+
+/* SLIDER & INPUT */
+.sidebar{
+  display:flex;
+  gap:20px;
+  flex-wrap:wrap;
+  padding:10px 20px;
+}
+.sidebar input[type="range"]{
+  width:200px;
+  accent-color:var(--accent);
+}
+.sidebar input[type="text"]{
+  padding:8px 10px;
+  border-radius:var(--radius);
+  border:1px solid var(--border);
+  background:var(--bg);
+  color:var(--text);
+}
+
+/* PRODUTOS AREA (LISTA VERTICAL) */
+.container{
+  flex:1;
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  gap:15px;
+  overflow-y:auto;
+}
+
+/* CARD PRODUTO */
+.link-btn{
+  display:flex;
+  flex-direction:row;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  text-decoration:none;
+  color:var(--text);
+  padding:10px;
+  gap:12px;
+  transition:.3s;
+  align-items:center;
+}
+.link-btn:hover{
+  border-color:var(--accent);
+  box-shadow:0 0 15px var(--accent);
+}
+.link-btn img{
+  width:100px;
+  height:100px;
+  object-fit:cover;
+  border-radius:var(--radius);
+}
+.link-text{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.link-text .desc{
+  font-size:12px;
+  opacity:.7;
+}
+.link-text .price{
+  font-size:14px;
+  font-weight:bold;
+  color:var(--accent);
+}
+.link-text .extra{
+  font-size:11px;
+  color:var(--accent);
+}
+
+/* RESPONSIVO */
+@media(max-width:900px){
+  .topbar{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+  .topbar .categories{
+    margin-top:5px;
+  }
+  .container{
+    padding:15px;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">Loja Kalthira</div>
+  <div class="theme-toggle" onclick="toggleTheme()">🌗 Alternar Tema</div>
+  <div class="categories">
+    <button onclick="filtrar('todos')">Todos</button>
+    <button onclick="filtrar('eletronicos')">Eletrônicos</button>
+    <button onclick="filtrar('seguranca')">Segurança</button>
+    <button onclick="filtrar('gamer')">Gamer</button>
+    <button onclick="filtrar('casa')">Casa</button>
+  </div>
+</div>
+
+<div class="sidebar">
+  <input type="range" id="precoSlider" min="0" max="2000" step="10" value="2000" oninput="filtrarPreco()">
+  <div>R$ <span id="precoValue">2000</span></div>
+  <input type="text" id="searchInput" placeholder="Digite o nome do produto" oninput="filtrarPesquisa()">
+</div>
+
+<div class="container products-area" id="produtos"></div>
+
 <script>
-const CATEGORIAS = [
-  { id:"todos", label:"Todos" },
-  { id:"eletronicos", label:"Eletrônicos" },
-  { id:"seguranca", label:"Segurança" },
-  { id:"saude", label:"Saúde & Beleza" },
-  { id:"gamer", label:"Gamer" },
-  { id:"casa", label:"Casa" },
+// ===== LISTA DE PRODUTOS =====
+const produtos = [
+{
+  nome: "Câmera De Vídeo Wi-Fi Intelbras IM3 C MicroSD 32GB Branco",
+  categoria: "seguranca",
+  preco: 239,
+  precoText: "R$ 239",
+  extra: "6x R$ 39,83 sem juros",
+  link: "https://www.mercadolivre.com.br/cmera-de-video-wi-fi-intelbras-im3-c-microsd-32gb-branco/p/MLB23409605",
+  imagem: "https://http2.mlstatic.com/D_Q_NP_849785-MLA88970380283_072025-F.webp",
+  desc: ["Unidades por kit: 1.","Compatível com assistentes virtuais como Amazon Alexa e Google Assistente.","Notificação por movimento"]
+},
+{
+  nome: "Smartphone Motorola Moto g35 5G - 256GB 12GB (4GB RAM+8GB Ram Boost)",
+  categoria: "eletronicos",
+  preco: 989.10,
+  precoText: "R$ 989,10",
+  extra: "ou R$ 1.099 em 10x R$ 109,90 sem juros",
+  link: "https://www.mercadolivre.com.br/smartphone-motorola-moto-g35-5g-256gb-12gb-4gb-ram8gb-ram-boost-e-camera-50mp-com-ai-nfc-tela-67-com-superbrilho-cinza/p/MLB41998152",
+  imagem: "https://http2.mlstatic.com/D_Q_NP_743327-MLA99452274448_112025-F.webp",
+  desc: ["Memória RAM: 4 GB.","Compatível com redes 5G.","Tela de 6.7","Memória interna de 256GB."]
+},
+{
+  nome: "Celular Samsung Galaxy A07 256gb, 8gb.",
+  categoria: "eletronicos",
+  preco: 989.10,
+  precoText: "R$ 989,10",
+  extra: "ou R$ 1.099 em 10x R$ 109,90 sem juros",
+  link: "https://www.mercadolivre.com.br/celular-samsung-galaxy-a07-256gb-8gb-cmera-50mp-tela-67-proteco-ip54-processador-6nm-preto/p/MLB54961556",
+  imagem: "https://http2.mlstatic.com/D_Q_NP_895724-MLA91526198522_092025-F.webp",
+  desc: ["Tela PLS LCD de 6.7","Bateria de 5000 Ah.","Memória interna de 256GB.","Resistente à água.","Resistente à poeira."]
+}
 ];
 
-/* =========================
-   ✅ SISTEMA MELHORADO DE PRODUTOS
-   - addProduto(obj)
-   - addProdutos([obj1, obj2...])
-   - preenche campos automáticos
-========================= */
-const produtos = [];
-
-function formatarPrecoBR(valor){
-  const n = Number(valor || 0);
-  return "R$ " + n.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
-
-function hojeISO(){
-  const d = new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
-
-function normalizarDesc(desc){
-  if (Array.isArray(desc)) return desc.filter(Boolean).map(x => String(x).trim()).filter(Boolean);
-  if (typeof desc === "string") {
-    // pode separar por |, ; ou quebra de linha
-    return desc
-      .split(/\||;|\n/g)
-      .map(x => x.trim())
-      .filter(Boolean);
-  }
-  return [];
-}
-
-function categoriaValida(cat){
-  return CATEGORIAS.some(c => c.id === cat && c.id !== "todos");
-}
-
-function addProduto(prod){
-  if (!prod || typeof prod !== "object") {
-    console.warn("Produto inválido:", prod);
-    return;
-  }
-
-  const precoNum = Number(prod.preco);
-  const categoria = String(prod.categoria || "").trim();
-
-  if (!prod.nome) {
-    console.warn("Produto sem nome:", prod);
-    return;
-  }
-  if (!categoriaValida(categoria)) {
-    console.warn(`Categoria inválida: "${categoria}". Use: eletronicos | seguranca | saude | gamer | casa`);
-    return;
-  }
-  if (Number.isNaN(precoNum)) {
-    console.warn(`Preço inválido no produto "${prod.nome}"`);
-    return;
-  }
-  if (!prod.link) {
-    console.warn(`Produto "${prod.nome}" sem link`);
-    return;
-  }
-  if (!prod.imagem) {
-    console.warn(`Produto "${prod.nome}" sem imagem`);
-    return;
-  }
-
-  const imagens = Array.isArray(prod.imagens) && prod.imagens.length
-    ? prod.imagens.filter(Boolean)
-    : [prod.imagem];
-
-  const produtoFinal = {
-    nome: String(prod.nome).trim(),
-    categoria,
-    preco: precoNum,
-    precoText: prod.precoText ? String(prod.precoText) : formatarPrecoBR(precoNum),
-    extra: prod.extra ? String(prod.extra) : "",
-    link: String(prod.link).trim(),
-    imagem: String(prod.imagem).trim(),
-    imagens,
-    desc: normalizarDesc(prod.desc),
-    addedAt: prod.addedAt ? String(prod.addedAt) : hojeISO()
-  };
-
-  produtos.push(produtoFinal);
-}
-
-function addProdutos(lista){
-  if (!Array.isArray(lista)) return;
-  lista.forEach(addProduto);
-}
-
-/* =========================
-   ✅ SEUS PRODUTOS (agora mais fácil de cadastrar)
-   Você pode continuar usando no estilo antigo também.
-========================= */
-addProdutos([
-  {
-    nome: "Câmera De Vídeo Wi-Fi Intelbras IM3 C MicroSD 32GB Branco",
-    categoria: "seguranca",
-    preco: 239,
-    extra: "6x de R$ 39,83 sem juros",
-    link: "https://www.mercadolivre.com.br/cmera-de-video-wi-fi-intelbras-im3-c-microsd-32gb-branco/p/MLB23409605?pdp_filters=item_id%3AMLB4077829432#polycard_client=affiliates&wid=MLB4077829432&sid=affiliates",
-    imagem: "https://http2.mlstatic.com/D_Q_NP_849785-MLA88970380283_072025-F.webp",
-    imagens: [
-      "https://http2.mlstatic.com/D_Q_NP_849785-MLA88970380283_072025-F.webp"
-    ],
-    desc: [
-      "Unidades por kit: 1",
-      "Compatível com Alexa e Google Assistente",
-      "Conexão Wi-Fi e imagem Full HD",
-      "Visão noturna e acesso remoto",
-      "Notificação por movimento"
-    ],
-    addedAt: "2026-02-20"
-  },
-  {
-    nome: "Smartphone Motorola Moto g35 5G — 256GB (RAM Boost)",
-    categoria: "eletronicos",
-    preco: 989.10,
-    extra: "ou R$ 1.099 em 10x de R$ 109,90 sem juros",
-    link: "https://www.mercadolivre.com.br/smartphone-motorola-moto-g35-5g-256gb-12gb-4gb-ram8gb-ram-boost-e-camera-50mp-com-ai-nfc-tela-67-com-superbrilho-cinza/p/MLB41998152?pdp_filters=item_id%3AMLB3953571145#polycard_client=affiliates&wid=MLB3953571145&sid=affiliates",
-    imagem: "https://http2.mlstatic.com/D_Q_NP_743327-MLA99452274448_112025-F.webp",
-    desc: "Compatível com redes 5G | Tela de 6.7 | Memória interna de 256GB | Som com Dolby Atmos",
-    addedAt: "2026-02-19"
-  },
-  {
-    nome: "Celular Samsung Galaxy A07 — 256GB",
-    categoria: "eletronicos",
-    preco: 989.10,
-    extra: "ou R$ 1.099 em 10x de R$ 109,90 sem juros",
-    link: "https://www.mercadolivre.com.br/celular-samsung-galaxy-a07-256gb-8gb-cmera-50mp-tela-67-proteco-ip54-processador-6nm-preto/p/MLB54961556",
-    imagem: "https://http2.mlstatic.com/D_Q_NP_895724-MLA91526198522_092025-F.webp",
-    desc: ["Tela PLS LCD de 6.7","Câmera traseira de 50MP","Bateria de 5000mAh","Resistente à água e poeira"],
-    addedAt: "2026-02-18"
-  },
-  {
-    nome: "Cadeira de escritório Delta Boss gamer",
-    categoria: "gamer",
-    preco: 237.99,
-    extra: "ou 6x R$ 39,66 sem juros",
-    link: "https://www.mercadolivre.com.br/cadeira-de-escritorio-delta-boss-gamer-ergonmica-preta-com-estofado-de-malha/p/MLB19047858?offer_type=BEST_INSTALLMENTS",
-    imagem: "https://http2.mlstatic.com/D_Q_NP_761829-MLA95666829898_102025-F.webp",
-    imagens: [
-      "https://http2.mlstatic.com/D_Q_NP_898497-MLA49692821708_042022-F.webp",
-      "https://http2.mlstatic.com/D_Q_NP_761829-MLA95666829898_102025-F.webp"
-    ],
-    desc: ["Unidades por kit: 1","Material do estofamento: Malha","Cor principal: Preto","Altura do encosto: 71 cm","Largura do assento: 61 cm","Altura mínima do chão ao assento: 42 cm","Com apoio de braços: Sim","É ergonômica: Sim"],
-    addedAt: "2026-02-21"
-  }
-]);
-
-/* =========================
-   ✅ EXEMPLO DE COMO ADICIONAR NOVO PRODUTO (mais simples)
-   (pode apagar este exemplo depois)
-========================= */
-// addProduto({
-//   nome: "Mouse Gamer RGB 7200 DPI",
-//   categoria: "gamer",
-//   preco: 129.90,
-//   extra: "ou 12x de R$ 12,66",
-//   link: "https://seu-link-aqui.com",
-//   imagem: "https://sua-imagem-aqui.webp",
-//   // imagens: ["https://img1.webp", "https://img2.webp"], // opcional
-//   desc: "RGB | 7200 DPI | Cabo reforçado | 7 botões",
-//   // addedAt: "2026-02-23" // opcional (se não passar, usa data de hoje)
-// });
-
+// ===== GERAR PRODUTOS =====
+const container = document.getElementById("produtos");
 let categoriaAtual = "todos";
 let precoMax = 2000;
 let pesquisa = "";
 
-const precoSlider = document.getElementById("precoSlider");
-const precoLabel  = document.getElementById("precoLabel");
-const recentSection = document.getElementById("recentSection");
-
-const grid = document.getElementById("produtosGrid");
-const recentCarousel = document.getElementById("recentCarousel");
-
-/* =========================
-   Menu de categorias (telinha)
-========================= */
-const catMenu = document.getElementById("catMenu");
-const catBackdrop = document.getElementById("catBackdrop");
-const catMenuList = document.getElementById("catMenuList");
-
-function toggleCatMenu(){
-  const open = catMenu.classList.toggle("show");
-  catBackdrop.classList.toggle("show", open);
-}
-function closeCatMenu(){
-  catMenu.classList.remove("show");
-  catBackdrop.classList.remove("show");
-}
-document.addEventListener("keydown", (e) => {
-  if(e.key === "Escape") closeCatMenu();
-});
-
-/* cria os botões do menu e marca ativo */
-function renderCatMenu(){
-  catMenuList.innerHTML = "";
-  CATEGORIAS.forEach(c => {
-    const btn = document.createElement("button");
-    btn.className = "cat-btn" + (c.id === categoriaAtual ? " active" : "");
-    btn.type = "button";
-    btn.textContent = c.label;
-    btn.onclick = () => { filtrar(c.id); closeCatMenu(); };
-    catMenuList.appendChild(btn);
+function renderProdutos(){
+  container.innerHTML = "";
+  const filtrados = produtos.filter(p => {
+    return (categoriaAtual === "todos" || p.categoria === categoriaAtual)
+      && p.preco <= precoMax
+      && p.nome.toLowerCase().includes(pesquisa.toLowerCase());
   });
-}
 
-/* ========================= */
-function getFiltrados(){
-  return produtos.filter(p => {
-    const okCat = (categoriaAtual === "todos" || p.categoria === categoriaAtual);
-    const okPreco = p.preco <= Number(precoMax);
-    const okSearch = p.nome.toLowerCase().includes(pesquisa.toLowerCase());
-    return okCat && okPreco && okSearch;
-  });
-}
+  filtrados.forEach(produto => {
+    const link = document.createElement("a");
+    link.className = "link-btn";
+    link.href = produto.link;
+    link.target = "_blank";
 
-function renderGrid(){
-  grid.innerHTML = "";
-  const filtrados = getFiltrados();
-
-  if (filtrados.length === 0) {
-    grid.innerHTML = `
-      <div style="grid-column:1/-1; padding:20px; border:1px dashed var(--border); border-radius:14px; text-align:center; opacity:.85;">
-        Nenhum produto encontrado com esses filtros.
+    link.innerHTML = `
+      <img src="${produto.imagem}">
+      <div class="link-text">
+        ${produto.nome}
+        <div class="desc">${produto.desc.join(" • ")}</div>
+        <div class="price">${produto.precoText}</div>
+        <div class="extra">${produto.extra}</div>
       </div>
     `;
-    return;
-  }
-
-  filtrados.forEach(p => {
-    const card = document.createElement("div");
-    card.className = "card";
-    const descPreview = (p.desc || []).slice(0,3).join(" • ");
-
-    card.innerHTML = `
-      <img src="${p.imagem}" alt="${escapeHtml(p.nome)}">
-      <div class="card-body">
-        <div class="name">${escapeHtml(p.nome)}</div>
-        <div class="desc">${escapeHtml(descPreview)}</div>
-        <div class="price">${escapeHtml(p.precoText || ("R$ " + p.preco))}</div>
-        <div class="extra">${escapeHtml(p.extra || "")}</div>
-        <div class="actions">
-          <button class="details" onclick="abrirModalByIndex(${getRealIndex(p)})">Ver produto</button>
-          <button class="buy" onclick="abrirCompra('${encodeURI(p.link)}')">Comprar</button>
-        </div>
-      </div>
-    `;
-    grid.appendChild(card);
+    container.appendChild(link);
   });
 }
 
-function getRealIndex(prod){ return produtos.indexOf(prod); }
+function filtrar(cat){ categoriaAtual = cat; renderProdutos(); }
+function filtrarPreco(){ precoMax = document.getElementById("precoSlider").value; document.getElementById("precoValue").innerText = precoMax; renderProdutos(); }
+function filtrarPesquisa(){ pesquisa = document.getElementById("searchInput").value; renderProdutos(); }
 
-/* =========================
-   “Recentes” só por 24 horas
-========================= */
-const ONE_DAY_MS = 24 * 60 * 60 * 1000;
-
-function isRecent24h(p){
-  const t = Date.parse(p.addedAt || "");
-  if(Number.isNaN(t)) return false;
-  return (Date.now() - t) <= ONE_DAY_MS;
-}
-
-function renderRecent(){
-  recentCarousel.innerHTML = "";
-
-  const recentes24h = produtos
-    .filter(isRecent24h)
-    .sort((a,b) => Date.parse(b.addedAt) - Date.parse(a.addedAt))
-    .slice(0, 12);
-
-  if(recentes24h.length === 0){
-    recentSection.style.display = "none";
-    return;
-  }
-
-  recentSection.style.display = (categoriaAtual === "todos" ? "block" : "none");
-
-  recentes24h.forEach(p => {
-    const item = document.createElement("div");
-    item.className = "carousel-card";
-    item.innerHTML = `
-      <img src="${p.imagem}" alt="${escapeHtml(p.nome)}">
-      <div class="name">${escapeHtml(p.nome)}</div>
-      <div class="price">${escapeHtml(p.precoText || ("R$ " + p.preco))}</div>
-      <div class="mini">${escapeHtml(p.extra || "")}</div>
-      <button class="mini-btn" onclick="abrirModalByIndex(${getRealIndex(p)})">Ver produto</button>
-    `;
-    recentCarousel.appendChild(item);
-  });
-}
-
-function atualizarVisibilidadeRecentes(){
-  const hasRecent = produtos.some(isRecent24h);
-  recentSection.style.display = (categoriaAtual === "todos" && hasRecent) ? "block" : "none";
-}
-
-function filtrar(cat){
-  categoriaAtual = cat;
-  renderCatMenu();
-  atualizarVisibilidadeRecentes();
-  renderGrid();
-}
-
-function filtrarPreco(){
-  precoMax = Number(precoSlider.value);
-  precoLabel.textContent = precoMax;
-  renderGrid();
-}
-
-function filtrarPesquisa(){
-  pesquisa = document.getElementById("searchInput").value || "";
-  renderGrid();
-}
-
-/* ===== MODAL ===== */
-let modalIndex = -1;
-let galleryIndex = 0;
-
-const modal = document.getElementById("modal");
-const gMain = document.getElementById("gMain");
-const gThumbs = document.getElementById("gThumbs");
-const gPrev = document.getElementById("gPrev");
-const gNext = document.getElementById("gNext");
-
-const mTitle = document.getElementById("mTitle");
-const mPrice = document.getElementById("mPrice");
-const mExtra = document.getElementById("mExtra");
-const mDesc = document.getElementById("mDesc");
-const mBuy = document.getElementById("mBuy");
-
-let scrollYBeforeModal = 0;
-
-function abrirModalByIndex(index){
-  modalIndex = index;
-  const p = produtos[index];
-  if(!p) return;
-
-  scrollYBeforeModal = window.scrollY || 0;
-  document.body.style.position = "fixed";
-  document.body.style.top = `-${scrollYBeforeModal}px`;
-  document.body.style.left = "0";
-  document.body.style.right = "0";
-  document.body.style.width = "100%";
-
-  mTitle.textContent = p.nome;
-  mPrice.textContent = p.precoText || ("R$ " + p.preco);
-  mExtra.textContent = p.extra || "";
-
-  mDesc.innerHTML = "";
-  (p.desc || []).forEach(item => {
-    const li = document.createElement("li");
-    li.textContent = item;
-    mDesc.appendChild(li);
-  });
-
-  mBuy.onclick = () => abrirCompra(p.link);
-
-  const imgs = (p.imagens && p.imagens.length) ? p.imagens : [p.imagem];
-  galleryIndex = 0;
-  renderGallery(imgs);
-
-  modal.classList.add("show");
-}
-
-function renderGallery(imgs){
-  gThumbs.innerHTML = "";
-  gMain.src = imgs[galleryIndex] || "";
-
-  imgs.forEach((src, i) => {
-    const im = document.createElement("img");
-    im.src = src;
-    if(i === galleryIndex) im.classList.add("active");
-    im.onclick = () => { galleryIndex = i; renderGallery(imgs); };
-    gThumbs.appendChild(im);
-  });
-
-  const many = imgs.length > 1;
-  gPrev.classList.toggle("disabled", !many);
-  gNext.classList.toggle("disabled", !many);
-
-  // ✅ garante seta correta visualmente
-  gPrev.innerHTML = "&lt;";
-  gNext.innerHTML = "&gt;";
-}
-
-function trocarImagem(dir){
-  const p = produtos[modalIndex];
-  if(!p) return;
-  const imgs = (p.imagens && p.imagens.length) ? p.imagens : [p.imagem];
-  if(imgs.length <= 1) return;
-  galleryIndex = (galleryIndex + dir + imgs.length) % imgs.length;
-  renderGallery(imgs);
-}
-
-function fecharModal(){
-  modal.classList.remove("show");
-
-  const top = document.body.style.top;
-  document.body.style.position = "";
-  document.body.style.top = "";
-  document.body.style.left = "";
-  document.body.style.right = "";
-  document.body.style.width = "";
-
-  const y = top ? Math.abs(parseInt(top, 10)) : scrollYBeforeModal;
-  window.scrollTo(0, y);
-}
-
-modal.addEventListener("click", (e) => { if(e.target === modal) fecharModal(); });
-
-function scrollRecent(dir){
-  const amount = 420 * dir;
-  recentCarousel.scrollBy({ left: amount, behavior: "smooth" });
-}
-
-function abrirCompra(url){
-  window.open(url, "_blank", "noopener,noreferrer");
-}
-
+// ===== TEMA =====
 function toggleTheme(){ document.body.classList.toggle("light"); }
 
-function scrollToProdutos(){
-  document.getElementById("produtosSection").scrollIntoView({behavior:"smooth"});
-}
-
-function escapeHtml(str){
-  return String(str ?? "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-}
-
-/* INIT */
-precoLabel.textContent = precoSlider.value;
-renderCatMenu();
-renderRecent();
-renderGrid();
-atualizarVisibilidadeRecentes();
+// ===== INIT =====
+renderProdutos();
 </script>
+
+</body>
+</html>
