@@ -234,6 +234,36 @@ body{
   accent-color:var(--accent);
 }
 
+/* NOVO: inputs de faixa */
+.price-inputs{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.price-field{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.price-field label{
+  font-size:12px;
+  opacity:.8;
+  font-weight:700;
+}
+.price-field input{
+  width:100%;
+  padding:10px 12px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:var(--card);
+  color:var(--text);
+  outline:none;
+  font-weight:700;
+}
+.price-field input:focus{
+  border-color:var(--accent);
+}
+
 /* ===== CONTEÚDO ===== */
 .main{
   padding:16px;
@@ -667,9 +697,41 @@ body.light .carousel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);}
   <div class="price-box">
     <div class="price-top">
       <div class="price-title"><i class="fa-solid fa-sliders"></i> Filtro de preço</div>
-      <div class="price-value">R$ <span id="precoLabel">2000</span></div>
+      <div class="price-value" id="faixaPrecoTexto">R$ 0 até R$ 10.000</div>
     </div>
-    <div class="price-sub">Arraste para ver produtos até esse valor.</div>
+
+    <div class="price-sub">Digite o valor mínimo e máximo ou use a barra para ajustar o máximo.</div>
+
+    <!-- NOVO: faixa digitada -->
+    <div class="price-inputs">
+      <div class="price-field">
+        <label for="precoMinInput">Valor mínimo</label>
+        <input
+          type="number"
+          id="precoMinInput"
+          min="0"
+          step="10"
+          value="0"
+          inputmode="numeric"
+          placeholder="0"
+        >
+      </div>
+
+      <div class="price-field">
+        <label for="precoMaxInput">Valor máximo</label>
+        <input
+          type="number"
+          id="precoMaxInput"
+          min="0"
+          step="10"
+          value="10000"
+          inputmode="numeric"
+          placeholder="10000"
+        >
+      </div>
+    </div>
+
+    <!-- Slider continua (controla o máximo) -->
     <input type="range" id="precoSlider" min="0" max="10000" step="10" value="10000" oninput="filtrarPreco()">
   </div>
 </div>
@@ -834,16 +896,29 @@ function escapeHtml(str){
     .replaceAll("'","&#039;");
 }
 
+function clamp(valor, min, max){
+  const n = Number(valor);
+  if (!Number.isFinite(n)) return min;
+  return Math.min(max, Math.max(min, n));
+}
+
 /* =========================================
    ESTADO
 ========================================= */
 let produtos = [];
 let categoriaAtual = "todos";
+
+/* ✅ agora a faixa é min + max */
+let precoMin = 0;
 let precoMax = 10000;
+
 let pesquisa = "";
 
 const precoSlider = document.getElementById("precoSlider");
-const precoLabel  = document.getElementById("precoLabel");
+const precoMinInput = document.getElementById("precoMinInput");
+const precoMaxInput = document.getElementById("precoMaxInput");
+const faixaPrecoTexto = document.getElementById("faixaPrecoTexto");
+
 const recentSection = document.getElementById("recentSection");
 const statusBox = document.getElementById("statusBox");
 
@@ -886,6 +961,53 @@ function renderCatMenu(){
 }
 
 /* =========================================
+   UI DO FILTRO DE PREÇO (NOVO)
+========================================= */
+function atualizarTextoFaixaPreco(){
+  faixaPrecoTexto.textContent = `${formatBRL(precoMin)} até ${formatBRL(precoMax)}`;
+}
+
+function sincronizarControlesPreco(){
+  const sliderMax = Number(precoSlider.max) || 10000;
+
+  precoMin = clamp(precoMin, 0, sliderMax);
+  precoMax = clamp(precoMax, 0, sliderMax);
+
+  // garante min <= max
+  if (precoMin > precoMax) {
+    precoMin = precoMax;
+  }
+
+  precoMinInput.value = String(precoMin);
+  precoMaxInput.value = String(precoMax);
+  precoSlider.value = String(precoMax);
+
+  atualizarTextoFaixaPreco();
+}
+
+function aplicarPrecoMinDigitado(){
+  const sliderMax = Number(precoSlider.max) || 10000;
+  let v = clamp(precoMinInput.value, 0, sliderMax);
+
+  if (v > precoMax) v = precoMax; // não deixa passar do máximo atual
+
+  precoMin = v;
+  sincronizarControlesPreco();
+  renderGrid();
+}
+
+function aplicarPrecoMaxDigitado(){
+  const sliderMax = Number(precoSlider.max) || 10000;
+  let v = clamp(precoMaxInput.value, 0, sliderMax);
+
+  if (v < precoMin) v = precoMin; // não deixa ficar menor que mínimo
+
+  precoMax = v;
+  sincronizarControlesPreco();
+  renderGrid();
+}
+
+/* =========================================
    CARREGAR PRODUTOS DO JSON
 ========================================= */
 async function carregarProdutosDoJSON(){
@@ -912,14 +1034,23 @@ async function carregarProdutosDoJSON(){
 
     statusBox.classList.add("hidden");
 
-    // Ajusta slider ao maior preço (opcional / facilita)
-    const maiorPreco = Math.max(10000, ...produtos.map(p => Number(p.preco) || 0));
-    precoSlider.max = String(Math.ceil(maiorPreco / 10) * 10);
-    if (Number(precoSlider.value) > Number(precoSlider.max)) {
-      precoSlider.value = precoSlider.max;
-    }
-    precoMax = Number(precoSlider.value);
-    precoLabel.textContent = precoSlider.value;
+    // Ajusta slider ao maior preço
+    const maiorPrecoProduto = Math.max(0, ...produtos.map(p => Number(p.preco) || 0));
+    const maxSlider = Math.max(10000, Math.ceil(maiorPrecoProduto / 10) * 10);
+
+    precoSlider.max = String(maxSlider);
+    precoSlider.min = "0";
+
+    // ajusta estados e inputs
+    precoMin = 0;
+    precoMax = maxSlider;
+
+    precoMinInput.min = "0";
+    precoMinInput.max = String(maxSlider);
+    precoMaxInput.min = "0";
+    precoMaxInput.max = String(maxSlider);
+
+    sincronizarControlesPreco();
 
     renderRecent();
     renderGrid();
@@ -942,10 +1073,12 @@ async function carregarProdutosDoJSON(){
 /* ========================= */
 function getFiltrados(){
   return produtos.filter(p => {
+    const preco = Number(p.preco) || 0;
     const okCat = (categoriaAtual === "todos" || p.categoria === categoriaAtual);
-    const okPreco = Number(p.preco) <= Number(precoMax);
+    const okPrecoMin = preco >= Number(precoMin);
+    const okPrecoMax = preco <= Number(precoMax);
     const okSearch = p.nome.toLowerCase().includes((pesquisa || "").toLowerCase());
-    return okCat && okPreco && okSearch;
+    return okCat && okPrecoMin && okPrecoMax && okSearch;
   });
 }
 
@@ -1039,8 +1172,16 @@ function filtrar(cat){
 }
 
 function filtrarPreco(){
-  precoMax = Number(precoSlider.value);
-  precoLabel.textContent = precoSlider.value;
+  // slider controla o máximo
+  const sliderMax = Number(precoSlider.max) || 10000;
+  let novoMax = clamp(precoSlider.value, 0, sliderMax);
+
+  if (novoMax < precoMin) {
+    precoMin = novoMax; // mantém consistência
+  }
+
+  precoMax = novoMax;
+  sincronizarControlesPreco();
   renderGrid();
 }
 
@@ -1048,6 +1189,12 @@ function filtrarPesquisa(){
   pesquisa = document.getElementById("searchInput").value || "";
   renderGrid();
 }
+
+/* Eventos dos inputs numéricos */
+precoMinInput.addEventListener("input", aplicarPrecoMinDigitado);
+precoMaxInput.addEventListener("input", aplicarPrecoMaxDigitado);
+precoMinInput.addEventListener("change", aplicarPrecoMinDigitado);
+precoMaxInput.addEventListener("change", aplicarPrecoMaxDigitado);
 
 /* ===== MODAL ===== */
 let modalIndex = -1;
@@ -1162,8 +1309,8 @@ function scrollToProdutos(){
 }
 
 /* INIT */
-precoLabel.textContent = precoSlider.value;
 renderCatMenu();
+sincronizarControlesPreco();  // ✅ já mostra faixa inicial
 renderRecent();
 renderGrid();
 atualizarVisibilidadeRecentes();
